@@ -140,6 +140,19 @@ const changePassword = async (req, res) => {
     }
   }
 
+  //creating staff
+
+  const createstaff = async()=>{
+    try {
+      const {email}= req.body
+      const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
+      
+      
+    } catch (error) {
+      res.status(500).json(error.message)
+    }
+  }
+
   
 
   module.exports = {

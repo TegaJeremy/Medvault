@@ -22,7 +22,7 @@ const getTotalDataCount = async(req,res)=>{
           res.status(200).json({message:'totalnumber of patient in the database is:', data:count})
       }
       else(
-          res.status(400).json({message:'no data found'})
+          res.status(400  ).json({message:'no data found'})
       )
       } catch (error) {
         console.error('Error fetching data count:', error.message);

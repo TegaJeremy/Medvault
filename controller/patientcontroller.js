@@ -3,7 +3,7 @@ const patientModel = require('../model/patientModel')
 
 const createpatient = async (req,res)=>{
     try {
-        const {name,address,patiendID}= req.body
+        const {name,address,patientID}= req.body
         let ID = Math.floor(Math.random()* 10000)
 
         const data = new patientModel({
