@@ -95,6 +95,36 @@ const getonepatient = async (req,res)=>{
     }
  }
 
+ 
+
+// // POST /patients/:id/diagnosis
+// router.post('/patients/:id/diagnosis', async (req, res) => {
+//   const { id } = req.params;
+//   const { diagnosisData } = req.body;
+
+//   try {
+//     // Find the patient by ID
+//     const patient = await Patient.findById(id);
+
+//     if (!patient) {
+//       return res.status(404).json({ error: 'Patient not found' });
+//     }
+
+//     // Add data to the diagnosis array
+//     patient.diagnosis.push(diagnosisData);
+
+//     // Save the updated patient
+//     await patient.save();
+
+//     return res.json({ message: 'Diagnosis data added successfully', patient });
+//   } catch (err) {
+//     return res.status(500).json({ error: 'Something went wrong' });
+//   }
+// });
+
+
+
+
 module.exports={
     createpatient,
     deletePatient,

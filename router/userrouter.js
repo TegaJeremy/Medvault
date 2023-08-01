@@ -12,12 +12,12 @@ router.route("/resendverificationemail").post(resendVerificationEmail)
 
 // login and logout route
 router.route("/login").post(login)
-router.route("/logout").post(logout)
+router.route("/logout/:id").post(logout)
 
 // password reset and change and forgot
 router.route("/forgotpassword").post(forgotPassword)
 router.route("/changepassword/:token").post(changePassword)
-router.route("/g/:token").post(resetPassword)
+router.route("/resetpassword/:token").post(resetPassword)
 
 // admin 
 router.route("/getallhospitals").get(getallHospital)

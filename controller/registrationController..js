@@ -245,6 +245,23 @@ const logout = async (req, res) => {
       });
     }
   }
+  const createstaff = async()=>{
+    try {
+      const {email}= req.body
+      const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
+      const baseurl = process.env.BASE_URL
+      const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to: user.email,
+        subject: "Email Verification",
+        html: `Please click on this link to register: <a href="http://localhost:7000/api/users/verify-email/${ token }">register</a>`,
+    };
+      
+      
+    } catch (error) {
+      res.status(500).json(error.message)
+    }
+  }
    
 module.exports = {
     register,
