@@ -31,7 +31,7 @@ const register = async (req, res)=>{
     //hash the password using bcrypt
     const hashedPassword  = bcrypt.hashSync(password, salt)
       // create a token
-      const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "5m" } );
+      const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "30m" } );
       //creating a function that will generate random id for the hospitals
       
     //   function generateID(){
@@ -131,7 +131,7 @@ const resendVerificationEmail = async (req, res) => {
         }
 
         // create a token
-            const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "5m" } );
+            const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "10m" } );
             
              // send verification email
             const baseUrl = process.env.BASE_URL
@@ -250,12 +250,19 @@ const logout = async (req, res) => {
       const {email}= req.body
       const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
       const baseurl = process.env.BASE_URL
-      const mailOptions = {
+      const mailOptions2 = {
         from: process.env.SENDER_EMAIL,
         to: user.email,
         subject: "Email Verification",
         html: `Please click on this link to register: <a href="http://localhost:7000/api/users/verify-email/${ token }">register</a>`,
     };
+    await transporter.sendMail( mailOptions2 );
+
+    res.status( 200 ).json( {
+        message: `email sent successfully to your email: ${user.email}`,
+        data:token
+        
+    } );
       
       
     } catch (error) {

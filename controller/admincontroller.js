@@ -16,6 +16,7 @@ const getallHospital = async (req,res)=>{
     }
 }
 
+
 // getting an hospital by its hospital id
  const getHospitalByID = async (req , res)=>{
     try{

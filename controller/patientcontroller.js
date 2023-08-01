@@ -1,24 +1,193 @@
 const patientModel = require('../model/patientModel')
+const cloudinary = require('../middleware/cloudinary')
+const fs = require('fs')
+const validator = require('../middleware/validation')
+
+
 //creating a patient
+const createpatient = async (req, res)=>{
+    try{
+        const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
+            MothersPhonenumber,relationshipStatus,spouseName,spousePhonenumber,otherContacts,diagnosis} = req.body
+    //     const {error} = await validatePerson(req.body);
+    //      if (error) {
+    //     res.status(409).json({
+    //         message: error.details[0].message
+    //     })
+    // } else {
 
-const createpatient = async (req,res)=>{
-    try {
-        const {name,address,patientID}= req.body
-        let ID = Math.floor(Math.random()* 10000)
+    // const validation = validator(email, phoneNumber, patientName);
+    // if (!validation.isValid) {
+    //   return res.status(400).json({
+    //     message: validation.message
+    //   });
+    // }
 
-        const data = new patientModel({
-            name,
-            address,
-            patientID:ID
+            const ID = Math.floor(Math.random()*10000)
+    
+        const patientnewImage = await cloudinary.uploader.upload(req.files.patientImage.tempFilePath, (error, patientImage) => {
+            try{return patientImage}
+            catch (error) {
+               console.log(error.message)
+            }
+    
         })
-          await data.save()
-        res.status(200).json({message:"patient created successfully", data:data})
+        const patientProfile = new patientModel({
+            patientName,
+            dateOfBirth,
+            gender,
+            homeAddress,
+            email,
+            phoneNumber,
+            bloodGroup,
+            fathersName,
+            fathersPhonenumber,
+            mothersName,
+            MothersPhonenumber,
+            relationshipStatus,
+            spouseName,
+            spousePhonenumber,
+            otherContacts,
+            diagnosis,
+            patientID:ID,
+            patientImage: patientnewImage.secure_url,
+            public_id:patientnewImage.public_id
+            // {
+            //         public_id:{public_id:patientnewImage.public_id,
+            //             url:patientnewImage.url}
+            //         }
+                
+            })
+
         
+
+            const patientInfo = await patientProfile.save();
+             if(patientInfo){
+             res.status(201).json({
+                 message: 'Patient information has been created succesfully',
+                 data: patientInfo
+             })
+         }else{
+             res.status(400).json({
+                 message: 'Patient information could not be created',
+                
+             })
+     
+         }
         
-    } catch (error) {
-        res.status(500).json(error.message)
+     
+         }catch(error){
+             res.status(500).json({
+                 message:error.message
+             })
+         }
+     }
+     
+
+     const getallpatient = async (req, res) => {
+        const getAllPatients = await patientModel.find();
+        if (getAllPatients.length === 0) {
+            res.status(200).json({
+                totalPatients: getAllPatients.length,
+                message: "All patients in the database",
+                data: getAllPatients
+            })
+        } else {
+            res.status(404).json({
+                message: "Can't find all patients in the database"
+            })
+        }
+    
     }
-}
+
+    const getonepatient = async (req, res) => {
+        let {patientID}= req.params
+        const patient = await patientModel.findOne({patientID})
+        if (patient) {
+            res.status(200).json({
+                message:"patient:",
+                data: patient
+            })
+        } else {
+            res.status(404).json({
+                message: "Unable to find patient with ID "+{patient}
+            })
+        }
+        
+    }
+
+    const updatePatient = async (req, res) => {
+        try {
+            const {patientID} = req.params;
+            const patient = await patientModel.findOne({patientID})
+            
+            const {patientName,dateOfBirth,gender,homeAddress,email,PhoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
+                MothersPhonenumber,relationshipStatus,spouseName,spousePhonenumber,otherContacts,diagnosis} = req.body;
+    
+            if(patient) {
+                if(patient.patientImage) {
+                    const public_id = patient.patientImage.split('/').pop().split('.')[0];
+                    console.log(public_id);
+                    await cloudinary.uploader.destroy(public_id);
+                }
+                const data = await cloudinary.uploader.upload(req.file.path);
+                patient.patientName = patientName;
+                patient.dateOfBirth = dateOfBirth;
+                patient.gender = gender;
+                patient.homeAddress = homeAddress;
+                patient.email = email;
+                patient.PhoneNumber = PhoneNumber;
+                patient.bloodGroup=bloodGroup
+                patient.fathersName=fathersName
+                patient.fathersPhonenumber=fathersPhonenumber
+                patient.MothersPhonenumber=MothersPhonenumber
+                patient.relationshipStatus=relationshipStatus
+                patient.spouseName=spouseName
+                patient.spousePhonenumber=spousespousePhonenumber
+                patient.otherContacts=otherContacts
+                patient.diagnosis=diagnosis
+                patient.patientImage = req.file.path;
+    
+                fs.unlinkSync(req.file.path);
+                res.status(200).json({
+                    message: 'Patient Updated Successfully',
+                    data:data
+                })
+            } else {
+                res.status(404).json({
+                    message: 'Patient not found'
+                })
+            }
+        } catch (error) {
+            const err = error.message;
+            res.status(500).json({
+                message: `error ${err}`
+            })
+        }
+    }
+
+
+    // exports.deletePatient = async (req, res) => {
+    //     try {
+    //         const { id } = req.params;
+    //         const patient = await patientModel.findById(id);
+    //         if(person) {
+    //             if(patient.patientImage) {
+    //                 const public_id = patient.patientImage.split('/').pop().split('.')[0];
+    //                 console.log(public_id);
+    //                 await cloudinary.uploader.destroy(public_id);
+    //             }
+    //             res.status(200).json({
+    //                 message: 'Patient Deleted Successfully'
+    //             })
+    //         }
+    //     } catch (error) {
+    //         const err = error.message;
+    //         res.status(500).json({
+    //             message: `error ${err}`
+    //         })
+    //     }
+    // }
 
 //deleting a patient
 const deletePatient = async (req,res)=>{
@@ -42,36 +211,7 @@ const deletePatient = async (req,res)=>{
 }
 
 //getting all patient
-const getallpatient = async (req,res)=>{
-    try {
-        const getall = await patientModel.find()
-        if(getall){
-        res.status(200).json({data:getall})
-        }else{
-            res.status(400).json()
-        }
-        
-    } catch (error) {
-        res.status(500).json(error.message) 
-    }
- 
-}
-//get one patient bt patientid
-const getonepatient = async (req,res)=>{
-    try {
-        const {patientID} = req.params
-        const patient = await patientModel.findOne({patientID})
-        if(!patient){
-            res.status(400).json({message:"patient not found"})
-      
-        }else{
-            res.status(200).json({data:patient})
-        }
-        
-    } catch (error) {
-        res.status(500).json(error.message) 
-    }
-}
+
 
 //function to rcover a deleted patient
  const recoverpatient = async (req,res)=>{
@@ -130,5 +270,6 @@ module.exports={
     deletePatient,
     recoverpatient,
     getallpatient,
-    getonepatient
+    getonepatient,
+    updatePatient
 }

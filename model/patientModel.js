@@ -1,20 +1,73 @@
 const mongoose = require('mongoose')
 
 const   patientschema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true["name is required"]
-    },
-    address:{
-        type:String,
-        required:true["address is required"]
-    },
+        patientName: {
+            type: String,
+            required: [true, 'patient name is Required']
+        },
+        dateOfBirth: {
+            type: String,
+            required: [true, 'Date Of Birth is Required']
+        },
+        gender: {
+            type: String,
+            required: [true, 'Gender is required']
+        },
+        homeAddress: {
+            type: String,
+            required: [true, 'HomeAddress is Required']
+        },
+        email: {
+            type: String,
+            required: [true, 'Email is Required'],
+            unique: true
+        },
+        phoneNumber: {
+            type: String,
+            required: [true, 'Mobile Phone Number is Required'],
+           
+        },
+        bloodGroup:{
+            type:String
+        },
+        patientImage: {
+                public_id: { type: String},
+                 url:{ type: String, }
+               
+        },
+        fathersName: {
+            type: String,
+        },
+        fathersPhonenumber: {
+            type: String,
+        },
+        mothersName: {
+            type: String,
+        },
+        MothersPhonenumber: {
+            type: String,
+        },
+        relationshipStatus: {
+            type: String,
+        },
+       spouseName: {
+            type: String,
+        },
+        spousePhonenumber: {
+            type: String,
+        },
+        otherContacts: {
+            type: String,
+        },
+        diagnosis: {
+            type: Array, 
+        },
+        patientID:{
+            type:String
+        },
     deleted:{
       type:Boolean,
       default:false
-    },
-    patientID:{
-        type:String
     }
     // deletedAt:{
     //     type:Date, expires:600
@@ -23,5 +76,5 @@ const   patientschema = new mongoose.Schema({
 },{timestamps:true}
 )
 
-const patientModel = mongoose.model("tegatest2", patientschema)
+const patientModel = mongoose.model("patient", patientschema)
 module.exports = patientModel
