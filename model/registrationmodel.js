@@ -29,6 +29,11 @@ facilityaddress:{
     type:String,
     required:true["city is required"]
 },
+  staff:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'staff',
+    require:true
+}],
     LGA:{
     type:String,
     required:true["LGA is required"]
@@ -61,5 +66,5 @@ isSuperAdmin:{
 },{timestamps:true}
 )
 
-const registerModel = mongoose.model("tegatest", registerschema)
+const registerModel = mongoose.model("HOSPITAL", registerschema)
 module.exports = registerModel

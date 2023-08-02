@@ -7,16 +7,19 @@ const  PORT = 6666;
 const db = require('./config/Db')
  const router = require("./router/userrouter")
  const prouter = require("./router/patientrouter")
+ const staffrouter = require("./router/staff router")
  const fileUploader = require('express-fileupload')
 // const app = express();
 
 app.use(fileUploader({
     useTempFiles: true,
 }))
+app.use(cors({origin:"*"}));
 app.use (express.json());
 app.use("/api" , router)
 app.use("/api", prouter)
-app.use(cors({origin:"*"}));
+app.use("/api", staffrouter)
+// app.use(cors({origin:"*"}));
 
 
 

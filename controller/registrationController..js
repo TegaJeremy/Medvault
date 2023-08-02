@@ -1,4 +1,5 @@
 const registerModel = require ('../model/registrationmodel')
+const staffModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
@@ -247,20 +248,30 @@ const logout = async (req, res) => {
   }
   const createstaff = async()=>{
     try {
-      const {email}= req.body
-      const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
+      const {staffemail, hospitalid}= req.body
+      const existingStaff = await staffModel.findOne({staffemail})
+      //checking for existing staff
+      if(existingStaff){
+        res.status(400).json({message:"staff with this email already exist"})
+      }
+      const registrationlink =`http://myplatform.com/register?hospitalid=${hospitalid}`
+      // //creat a token for the staff
+      // const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
+    
+      //send the mail
       const baseurl = process.env.BASE_URL
       const mailOptions2 = {
         from: process.env.SENDER_EMAIL,
         to: user.email,
-        subject: "Email Verification",
-        html: `Please click on this link to register: <a href="http://localhost:7000/api/users/verify-email/${ token }">register</a>`,
+        subject: "Registration",
+        text:`click on the link to to register, use the last digits in this link  as your hospital digit on the registration page${registrationlink}`
+        // html: `Please click on this link to register: <a href="http://localhost:7000/api/users/verify-email/$(register link)">register</a>`,
     };
     await transporter.sendMail( mailOptions2 );
+    
 
     res.status( 200 ).json( {
-        message: `email sent successfully to your email: ${user.email}`,
-        data:token
+        message: `email sent successfully to your email: `,
         
     } );
       
@@ -275,6 +286,7 @@ module.exports = {
     verifyEmail,
     resendVerificationEmail,
     login,
-    logout
+    logout,
+    createstaff
 
 }
