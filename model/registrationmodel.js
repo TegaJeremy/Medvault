@@ -42,8 +42,10 @@ facilityaddress:{
     type: String
 
 },
-hospitalID:{
-   type:String
+ hospitalcode:{
+   type:String,
+    unique: true
+   
 },
 isVerified:{
     type:Boolean,

@@ -20,8 +20,8 @@ const getallHospital = async (req,res)=>{
 // getting an hospital by its hospital id
  const getHospitalByID = async (req , res)=>{
     try{
-    const {hospitalID} = req.params
-    const gethospital = await adminModel.findOne({hospitalID})
+    const {hospitalcode} = req.params
+    const gethospital = await adminModel.findOne({hospitalcode})
     if(!gethospital){
         res.status(400).json({message:"error getting hospital please check the id "})
 

@@ -3,6 +3,7 @@ const staffModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const validatePerson = require('../middleware/validation')
 
 const transporter = nodemailer.createTransport({
     service:"Gmail",
@@ -19,12 +20,30 @@ const transporter = nodemailer.createTransport({
 const register = async (req, res)=>{
    try {
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
+    
+    const {error} = await validatePerson(req.body);
+         if (error) {
+          console.log(error),
+        res.status(409).json({
+
+            message: error.details[0].message
+        })
+    } else{
+
+    const validation = validator(email, facilityphone, facilityname);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: validation.message
+      });
+    }}
      // check if the entry email exist
      const isEmail = await registerModel.findOne( { email } );
      if ( isEmail ) {
          res.status( 400 ).json( {
              message: `user with this email: ${email} already exist.`
          })
+    
+    // }
         }else{
 
     //salt the password using bcrypt
@@ -54,7 +73,7 @@ const register = async (req, res)=>{
         state,
         city,
         LGA,
-        hospitalID:ID
+        hospitalcode:ID
     })
       // send verification email
       const baseUrl = process.env.BASE_URL
@@ -228,6 +247,7 @@ const resendVerificationEmail = async (req, res) => {
 const logout = async (req, res) => {
     try {
       const {userId} = req.user;
+      console.log(req.user)
   
       // Update the user's token to null
       const user = await registerModel.findByIdAndUpdate(userId, { token: null }, { new: true });

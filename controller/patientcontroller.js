@@ -1,7 +1,7 @@
 const patientModel = require('../model/patientModel')
 const cloudinary = require('../middleware/cloudinary')
 const fs = require('fs')
-const validator = require('../middleware/validation')
+// const validator = require('../middleware/validation')
 
 
 //creating a patient

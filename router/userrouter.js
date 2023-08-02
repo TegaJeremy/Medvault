@@ -21,7 +21,7 @@ router.route("/resetpassword/:token").post(resetPassword)
 
 // admin 
 router.route("/getallhospitals").get(getallHospital)
-router.route("/getbyid/:hospitalID").get(getHospitalByID)
+router.route("/getbyid/:hospitalcode").get(getHospitalByID)
 
 
 

@@ -22,24 +22,22 @@ const staffSchema = new mongoose.Schema({
     age: {
         type: String,
     },
-    // photo: {
-    //         public_id: { type: String},
-    //          url:{ type: String, }
-    // },
+    photo: {
+            public_id: { type: String},
+             url:{ type: String, }
+    },
     token: {
         type: String,
     },
-    isVerify: {
+    isVerified: {
         type: Boolean,
         default: false
     },
     role: {
         type: String,
     },
-    hospitalID:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'HOSPITAL',
-        require:true
+    hospitalcode:{
+        type:String
     },
     isAdmin: {
         type: Boolean,
@@ -53,5 +51,6 @@ const staffSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 const adminModel = mongoose.model('staff', staffSchema)
+
 
 module.exports = adminModel

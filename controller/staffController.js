@@ -20,17 +20,17 @@ const transporter = nodemailer.createTransport({
 const createStaffprofile = async (req, res) => {
     try {
         // get the request body
-        const { name, age, email, password, role, hospital } = req.body
-        console.log("recieved hospitalid:", hospitalID)
+        const { name, age, email, password, role, hospitalcode } = req.body
+        console.log("recieved hospitalcodde:", hospitalcode)
         
     // console.log('Received request body:', req.body);
 
-    // if (!hospitalID) {
-    //   return res.status(400).json({ message: 'hospitalID is missing in the request body' });
+    // if (!hospitalcode) {
+    //   return res.status(400).json({ message: 'hospitalcode is missing in the request body' });
     // }
         // look for the hospital
-        const gethospital = await registerModel.findOne({hospital})
-        console.log("recieved hospitalid:", gethospital)
+        const gethospital = await registerModel.findOne({hospitalcode})
+        // console.log("recieved hospitalcode:", gethospital)
         if (!gethospital) {
             return res.status(404).json({ message: "Error getting hospital. Please check ID." })
         }
@@ -39,6 +39,14 @@ const createStaffprofile = async (req, res) => {
         if (isEmail) {
             return res.status(400).json({ message: `User with email ${email} already exists` })
         } else {
+            
+         //upload photo function
+        const staffPhoto = await cloudinary.uploader.upload(req.files.photo.tempFilePath, (error, photo) => {
+            try{return photo}
+            catch (error) {
+                error.message
+            }
+        })
             // hash password
             const salt = bcryptjs.genSaltSync(10)
             const hashPass = bcryptjs.hashSync(password, salt)
@@ -50,13 +58,15 @@ const createStaffprofile = async (req, res) => {
                 age,
                 role,
                 password: hashPass,
-               // photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
+               photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
 
             const createStaff = new staffModel(data)
             // generate token
             const newToken = jwt.sign({ name, email }, process.env.secretKey, { expiresIn: "1d" })
-            // createStaff.hospitalID =  hospital;
+
+            createStaff.hospitalcode = hospitalcode
+
             createStaff.token = newToken
             await createStaff.save()
             // send verification link
@@ -71,26 +81,33 @@ const createStaffprofile = async (req, res) => {
             res.status(200).json({ message: "Create successful", data: createStaff })
         }
     } catch (error) {
+        console.error(error)
         res.status(500).json({ message: error.message })
     }
 }
 
 const getAllStaffByHospital = async (req, res) => {
     try {
-      const { hospitalID } = req.params;
-  
+      const { hospitalcode } = req.params;
       
-       // Look for the hospital with the specified hospitalID
-       const hospital = await registerModel.findOne({hospitalID });
+       // Look for the hospital with the specified hospitalcode
+       const hospital = await registerModel.findOne({hospitalcode });
+      
   
       if (!hospital) {
         return res.status(404).json({ message: 'Hospital not found' });
       }
   
-      // Find all staff members with the same hospitalID
-      const staffMembers = await staffModel.find({ hospitalID });
-  
-      res.status(200).json({ message: 'Staff members found', data: staffMembers });
+      // Find all staff members with the same hospitalcode
+      const staffMembers = await staffModel.find({ hospitalcode });
+    
+      if(staffMembers === 0){
+        res.status(404).json({message:"error getting staffs"})
+
+      }else(
+        res.status(200).json({ message: 'all ataff under this hospital are', data: staffMembers })
+      )
+     
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -98,102 +115,84 @@ const getAllStaffByHospital = async (req, res) => {
   
 
 
-// const createStaffprofile = async (req, res) => {
+  const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
 
-//     try {
-//         // get the request body
-//         const {name, age, email, password,role,hospitalID} = req.body
-//         //look for the hospital
-//         const hospital = await adminModel.findOne({hospitalID})
-//         if(!hospital){
-//             res.status(404).json({message:"error getting hospital please check id"})
-//         }
-//         // check if email exists
-//         const isEmail = await staffModel.findOne ({email})
-//         if(isEmail) {
-//             res.status(400).json({
-//                 message: `user with email ${email} already exists`
-//             })
+        // verify the token
+        const { email } = jwt.verify( token, process.env.secretKey );
 
-//         //  upload photo function
-//         // const staffPhoto = await cloudinary.uploader.upload(req.files.photo.tempFilePath, (error, photo) => {
-//         //     try{return photo}
-//         //     catch (error) {
-//         //         error.message
-//         //     }
-//         // })
+        const user = await staffModel.findOne( { email } );
+
+        // update the user verification
+        user.isVerified = true;
+
+        // save the changes
+        await user.save();
+
+        // update the user's verification status
+        const updatedUser = await staffModel.findOneAndUpdate( {email}, user );
+
+        res.status( 200 ).json( {
+            message: "User verified successfully",
+            data: updatedUser,
+        })
+        // res.status( 200 ).redirect( `${ process.env.BASE_URL }/login` );
+
+    } catch ( error ) {
+        res.status( 500 ).json( {
+            message: error.message
+        })
+    }
+}
+
+
+// resend verification
+const resendVerificationEmail = async (req, res) => {
+    try {
+        // get user email from request body
+        const { email } = req.body;
+
+        // find user
+        const user = await staffModel.findOne( { email } );
+        if ( !user ) {
+            return res.status( 404 ).json( {
+                error: "User not found"
+            } );
+        }
+
+        // create a token
+            const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "10m" } );
             
-//             // hash password
-//         }else{ 
-//             const salt = bcryptjs.genSaltSync(10)
+             // send verification email
+            const baseUrl = process.env.BASE_URL
+            const mailOptions = {
+                from: process.env.SENDER_EMAIL,
+                to: user.email,
+                subject: "Email Verification",
+                html: `Please click on the link to verify your email: <a href="http://localhost:7000/api/users/verify-email/${ token }">Verify Email</a>`,
+            };
 
-//             const hashPass = bcryptjs.hashSync(password, salt)
-//             ID = Math.floor(Math.random()*10000)
+            await transporter.sendMail( mailOptions );
 
-
-//             const data = {
-//                 name,
-//                 email,
-//                 staffID:ID,
-//                 age,
-//                 role,
-//                 hospitaID:hospital,
-//                 password: hashPass,
-//                 photo:{public_id:staffPhoto.public_id,
-//                 url:staffPhoto.url}
-//             }
-//             const createStaff = new staffModel(data)
-
-//              // generate token
-//         const newToken = jwt.sign({
-//             name,
-//             email
-//         }, process.env.JWT_TOKEN,{expiresIn: "1d"})
-
-//         createStaff.token = newToken
-
-//         await createStaff.save()
-
-//         //send verification link
-
-//         const subject = "kindly verify"
-
-//         // const link = `${req.protocol}://${req.get("host")}/userverify/${createStaff._id}`
-
-//         const link = `${req.protocol}://${req.get("host")}/api/userverify/${createStaff._id}/${newToken}`
-
-//         const message = `welcome onboard, kindly verify your account using this link ${link}`
-
-
-//         mailSender({
-
-//             email: createStaff.email ,
-//             subject,
-//             message
-//          } )
-//         // if(data.isVerify){
-//         //     res.status(200).json({
-//         //         message: "create successful",
-//         //         data: createStaff
-//         //      })
-//         // } else(
-//         //     res.status(400).json({message:"you are not verified, kindly verify your emaill adddress"})
-//         // )
-//         res.status(200).json({
-//             message: "create successful",
-//             data: createStaff
-         
-//         })
-//     }
-//         } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-        
-//     }
+        res.status( 200 ).json( {
+            message: `Verification email sent successfully to your email: ${user.email}`,
+            data:token
+            
+        } );
     
 
-// }
+    } catch ( error ) {
+        res.status( 500 ).json( {
+            message: error.message
+        })
+    
+    }
+}
+
+
+
+//   
 
 // verify email
 // exports.staffVerify = async(req,res)=>{
@@ -324,45 +323,68 @@ const getAllStaffByHospital = async (req, res) => {
 // }
 
 
- const logIn = async(req, res)=>{
+const logIn = async (req, res) => {
     try {
-        const { email, password,} = req.body;
-        const user = await staffModel.findOne({email});
-        if (!user) {
-            res.status(404).json({
-                message: 'User not found'
-            });
-        }  else {
-                const isPassword = await bcryptjs.compare(password, user.password);
-                user.isLogin=true
-                if(!isPassword) {
-                    res.status(400).json({
-                        message: 'Incorrect Password'
-                    });
-                } else {
-                    //const userLogin = await staffModel.findOne(user._staffId, {islogin: true}, { new: true });
-                    if(!userLogout.isLogin) {
-                        res.status(400).json({
-                            message: 'try again',
-                        })
-                    }else{
-                    const token = await genToken(user);
-                  
-                    
-                    res.status(200).json({
-                        message: 'Log in Successful',
-                        token: token,
-                        data: user
-                      });
-                    }
+    // Extract the user's username, email and password
+        const {email, password } = req.body;
+
+    // find user by their registered email or username
+        const checkUser = await staffModel.findOne({email})
+        // const checkUser = await registerModel.findOne({ $or: [{ username }, { email }] })
+
+        // check if the user exists
+        if (!checkUser) {
+            return res.status(404).json({
+                Failed: 'User not found'
+            })
+        }
+
+      // Compare user's password with the saved password.
+        const checkPassword = bcryptjs.compareSync(password, checkUser.password)
+      // Check for password error
+        if (!checkPassword) {
+            return res.status(404).json({
+                Message: 'Login Unsuccessful',
+                Failed: 'Invalid password'
+            })
+        }
+
+        // Check if the user if verified
+        if (!checkUser.isVerified) {
+            return res.status(404).json({
+              message: `User with this email: ${email} is not verified.`
+            })
+          }
+
+        const token = jwt.sign({
+          userId: checkUser._id,
+            password: checkUser.password,
+            // isAdmin: checkUser.isAdmin,
+            // isSuperAdmin: checkUser.isSuperAdmin
+
+        },
+            process.env.secretKey, { expiresIn: "1d" })
+
+        checkUser.token = token
+
+        checkUser.save()
+
+        res.status(200).json({
+            message: 'Login successful',
+            data: {
+                id: checkUser._id,  
+                token: checkUser.token
+
             }
-        }}
-        catch (error) {
+            
+        })
+
+    } catch (error) {
         res.status(500).json({
-            message: error.message
+            Error: error.message
         })
     }
-};
+}
 
 // to logout a staff
 const signOut = async(req, res)=>{
@@ -413,100 +435,136 @@ const signOut = async(req, res)=>{
 
 
 // update a staffs record 
- const updateStaff = async (req, res)=>{
-    try {
-        const { staffID } = req.params;
-        const staff = await staffModel.find({staffID});
-        const { name, email, password, role, age } = req.body;
-        const salt = await bcryptjs.genSalt(10);
-        const hashPassword = await bcryptjs.hash( password, salt );
-        // const { adminId } = req.params;
-        // const adminUser = await userModel.findById(adminId);
-        // if (adminUser.isAdmin == false) {
-        //     res.status(400).json({
-        //         message: 'You are not an Admin, Therefore you are not allowed to access this'
-        //     })
-        // } else {
-            const data = {
-                name: name || staff.name,
-                email: email || staff.email,
-                age: age || staff.age,
-                role: role || staff.role,
-                password: hashPassword || staff.password,
-                photo: staff.photo
-            };
+//  const updateStaff = async (req, res)=>{
+//     try {
+//         const { staffID } = req.params;
+//         const staff = await staffModel.find({staffID});
+//         const { name, email, password, role, age } = req.body;
+//         const salt = await bcryptjs.genSalt(10);
+//         const hashPassword = await bcryptjs.hash( password, salt );
+//         // const { adminId } = req.params;
+//         // const adminUser = await userModel.findById(adminId);
+//         // if (adminUser.isAdmin == false) {
+//         //     res.status(400).json({
+//         //         message: 'You are not an Admin, Therefore you are not allowed to access this'
+//         //     })
+//         // } else {
+//             const data = {
+//                 name: name || staff.name,
+//                 email: email || staff.email,
+//                 age: age || staff.age,
+//                 role: role || staff.role,
+//                 password: hashPassword || staff.password,
+//                 photo: staff.photo
+//             };
 
-        // while updating.
-        if (req.file && req.file.filename) {
-            const oldPhoto = `uploads/${staff.photo}`;
-            await fs.unlinkSync(oldPhoto)
-            data.photo = req.file.filename
-        }
-            const updateStaff = await staffModel.findOneAndUpdate(staffID, data, {new: true});
-            if (!updateStaff) {
-                res.status(400).json({
-                    message: 'Failed to Update User'
-                })
-            } else {
-                res.status(200).json({
-                    message: 'User updated successfully',
-                    data: updateStaff
-                })
-            }
-        } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+//         // while updating.
+//         if (req.file && req.file.filename) {
+//             const oldPhoto = `uploads/${staff.photo}`;
+//             await fs.unlinkSync(oldPhoto)
+//             data.photo = req.file.filename
+//         }
+//             const updateStaff = await staffModel.findOneAndUpdate(staffID, data, {new: true});
+//             if (!updateStaff) {
+//                 res.status(400).json({
+//                     message: 'Failed to Update User'
+//                 })
+//             } else {
+//                 res.status(200).json({
+//                     message: 'User updated successfully',
+//                     data: updateStaff
+//                 })
+//             }
+//         } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
+
+const updateStaff = async (req, res) => {
+    try {
+      const { staffID } = req.params;
+      const staff = await staffModel.findOne({ staffID });
+  
+      if (!staff) {
+        return res.status(404).json({ message: 'Staff not found' });
+      }
+  
+      const { name, email, password, role, age } = req.body;
+  
+      // Prepare the fields to be updated
+      const updateData = {
+        name: name || staff.name,
+        email: email || staff.email,
+        age: age || staff.age,
+        role: role || staff.role,
+        password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : staff.password,
+        photo: staff.photo,
+      };
+  
+      // Check if a new photo is provided in the request and update accordingly
+      if (req.file && req.file.filename) {
+        const oldPhoto = `uploads/${staff.photo}`;
+        await fs.unlinkSync(oldPhoto);
+        updateData.photo = req.file.filename;
+      }
+  
+      // Perform the update and set { new: true } option to get the updated document
+      const updatedStaff = await staffModel.findOneAndUpdate({ staffID }, updateData, { new: true });
+  
+      if (!updatedStaff) {
+        return res.status(400).json({ message: 'Failed to Update User' });
+      } else {
+        return res.status(200).json({ message: 'User updated successfully', data: updatedStaff });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-}
+  };
+  
 
 //delete a staff
-const deleteStaff = async (req, res)=>{
+const deleteStaff = async (req, res) => {
     try {
-        const { staffID } = req.params;
-        const staff = await staffModel.find({staffID});
-        const { name, email, password, role, age } = req.body;
-        const salt = await bcryptjs.genSalt(10);
-        const hashPassword = await bcryptjs.hash( password, salt );
-        // const { adminId } = req.params;
-        // const adminUser = await userModel.findById(adminId);
-        // if (adminUser.isAdmin == false) {
-        //     res.status(400).json({
-        //         message: 'You are not an Admin, Therefore you are not allowed to access this'
-        //     })
-        // } else {
-            const data = {
-                name: name || staff.name,
-                email: email || staff.email,
-                age: age || staff.age,
-                role: role || staff.role,
-                password: hashPassword || staff.password,
-                photo: staff.photo
-            };
+        const { hospitalcode } = req.params;
+        const Admin = await registerModel.findOne({ hospitalcode });
+        const isAdmin = Admin.hospitalcode; 
+        console.log(isAdmin)
+  
+      if (!isAdmin) {
+       return  res.status(404).json({ message: 'you are not allowed to perform this function' });
+      }
 
-        // while updating.
-        if (req.file && req.file.filename) {
-            const oldPhoto = `uploads/${staff.photo}`;
-            await fs.unlinkSync(oldPhoto)
-            data.photo = req.file.filename
-        }
-            const updateStaff = await staffModel.findOneAndUpdate(staffID, data,);
-            if (!updateStaff) {
-                res.status(400).json({
-                    message: 'Failed to Update User'
-                })
-            } else {
-                res.status(200).json({
-                    message: 'User updated successfully',
-                    data: updateStaff
-                })
-            }
-        } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+      const {staffID}= req.params
+      const staff = await staffModel.findOne({staffID})
+      
+      if(!staff)(
+          res.status(404).json({message:"the staff with this id is not found"})
+      )
+  
+      // Delete the staff member
+      await staffModel.findOneAndDelete({ staffID });
+      // Remove the staff's photo from Cloudinary if it exists
+      if (staff.photo && typeof staff.photo === 'string') {
+        const publicID = staff.photo.split('.').slice(0, -1).join('.');
+  
+        // Use Cloudinary's API to delete the image
+        await cloudinary.uploader.destroy(publicID);
+      }
+  
+      // Remove the staff's photo if it exists
+    //   if (staff.photo) {
+    //     const photoPath = `uploads/${staff.photo}`;
+    //     await fs.unlinkSync(photoPath);
+      //}
+  
+      return res.status(200).json({ message: 'Staff member deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-}
+  };
+  
 
 // get one staff
  const getOne = async (req, res)=>{
@@ -549,7 +607,10 @@ module.exports={
     allRegStaff,
     updateStaff,
     getOne,
-    getAllStaffByHospital
+    getAllStaffByHospital,
+    verifyEmail,
+    resendVerificationEmail,
+    deleteStaff
 
 }
 
