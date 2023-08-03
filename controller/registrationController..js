@@ -3,7 +3,7 @@ const staffModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
-const validatePerson = require('../middleware/validation')
+const validator = require('../middleware/validation')
 
 const transporter = nodemailer.createTransport({
     service:"Gmail",
@@ -20,22 +20,13 @@ const transporter = nodemailer.createTransport({
 const register = async (req, res)=>{
    try {
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
-    
-    const {error} = await validatePerson(req.body);
-         if (error) {
-          console.log(error),
-        res.status(409).json({
-
-            message: error.details[0].message
-        })
-    } else{
 
     const validation = validator(email, facilityphone, facilityname);
     if (!validation.isValid) {
       return res.status(400).json({
         message: validation.message
       });
-    }}
+    }
      // check if the entry email exist
      const isEmail = await registerModel.findOne( { email } );
      if ( isEmail ) {
@@ -43,7 +34,7 @@ const register = async (req, res)=>{
              message: `user with this email: ${email} already exist.`
          })
     
-    // }
+    
         }else{
 
     //salt the password using bcrypt
@@ -266,32 +257,102 @@ const logout = async (req, res) => {
       });
     }
   }
-  const createstaff = async()=>{
+
+//updating hospital info  
+const updatehospitalinfo = async (req, res) => {
+  try {
+
+    
+    const { hospitalcode } = req.params;
+    const hospital = await registerModel.findOne({ hospitalcode });
+    //check for errors if the hospital is not registered
+    if (!hospital) {
+      return res.status(404).json({ message: 'hospital not foung, please check the hospital code passed' });
+    }
+
+    const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
+    //validates the data passed
+    // const validation = validator(email, facilityphone, facilityname);
+    // if (!validation.isValid) {
+    //   return res.status(400).json({
+    //     message: validation.message
+    //   });
+    //  }
+
+    // Prepare the fields to be updated
+    const updateData = {
+      facilityname: facilityname || hospital.facilityname,
+      facilityaddress: facilityaddress || hospital.facilityaddress,
+      email: email || hospital.email,
+      password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : hospital.password,
+      facilityphone: facilityphone || hospital.facilityphone,
+      state: state || hospital.state,
+      city: city || hospital.city,
+      LGA: LGA || hospital.LGA,
+    };
+
+    
+
+    // Perform the update and set { new: true } option to get the updated document
+    const updatedhospital = await registerModel.findOneAndUpdate({ hospitalcode }, updateData, { new: true });
+
+    if (!updatedhospital) {
+      return res.status(400).json({ message: 'Failed to Update hospital details' });
+    } else {
+      return res.status(200).json({ message: 'hospital details updated successfully', data: updatedhospital });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteAccount = async(req,res)=>{
+try {
+  const {hospitalcode}= req.params
+  const deletehospital = await registerModel.findOne({hospitalcode})
+  const getmail = deletehospital.email
+  console.log(getmail)
+  const ID = deletehospital.hospitalcode
+  //sending a mail
+  // const baseUrl = process.env.BASE_URL
+      const mailOptions = {
+          from: getmail,
+          to:  process.env.SENDER_EMAIL,
+          subject: "requesting to delete my Account",
+          text:`requsting to delete my account, my hospital code is:${ID}, this is my mail:${getmail}`
+      };
+      await transporter.sendMail( mailOptions );
+      res.status(200).json({message:"email successfully sent, you will be contated in the next 5 days"})
+  
+} catch (error) {
+  res.status(500).json(error.message)
+}
+           
+}
+  const createstaff = async(req,res)=>{
     try {
-      const {staffemail, hospitalid}= req.body
-      const existingStaff = await staffModel.findOne({staffemail})
-      //checking for existing staff
-      if(existingStaff){
-        res.status(400).json({message:"staff with this email already exist"})
-      }
-      const registrationlink =`http://myplatform.com/register?hospitalid=${hospitalid}`
-      // //creat a token for the staff
-      // const token = await jwt.sign({ email }, process.env.secretKey, { expiresIn: "30m" })
+      // console.log("Request Body:", req.body); // Log the entire req.body to check the data received
+
+      const { email, hospitalcode } = req.body;
+     
+      
+      const registrationlink =`http://myplatform.com/register?hospitalcode=${hospitalcode}`
+             
     
       //send the mail
       const baseurl = process.env.BASE_URL
       const mailOptions2 = {
         from: process.env.SENDER_EMAIL,
-        to: user.email,
+        to:email,
         subject: "Registration",
-        text:`click on the link to to register, use the last digits in this link  as your hospital digit on the registration page${registrationlink}`
-        // html: `Please click on this link to register: <a href="http://localhost:7000/api/users/verify-email/$(register link)">register</a>`,
-    };
+        text:`click on the link to to register, use the last digits in this link  as the hospitalcode on the registration page${registrationlink}`
+        
+      }
     await transporter.sendMail( mailOptions2 );
     
 
     res.status( 200 ).json( {
-        message: `email sent successfully to your email: `,
+        message: `email sent successfully sent to staff: `
         
     } );
       
@@ -307,6 +368,8 @@ module.exports = {
     resendVerificationEmail,
     login,
     logout,
+    updatehospitalinfo,
+    deleteAccount,
     createstaff
 
 }

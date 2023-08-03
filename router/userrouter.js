@@ -1,6 +1,6 @@
 const express = require('express')
 
-const { register, verifyEmail, resendVerificationEmail, login,logout }= require('../controller/registrationController.')
+const { register, verifyEmail, resendVerificationEmail, login,logout, updatehospitalinfo, deleteAccount, createstaff }= require('../controller/registrationController.')
 const { forgotPassword, changePassword, resetPassword }= require('../controller/passwordController')
 const { getallHospital, getHospitalByID }= require('../controller/admincontroller')
 const router = express.Router()
@@ -22,6 +22,12 @@ router.route("/resetpassword/:token").post(resetPassword)
 // admin 
 router.route("/getallhospitals").get(getallHospital)
 router.route("/getbyid/:hospitalcode").get(getHospitalByID)
+router.route("/updatehospitalinfo/:hospitalcode").put(updatehospitalinfo)
+router.route("/deleteaccount/:hospitalcode").post(deleteAccount)
+
+//creating a staff(sending staff a link)
+router.route('/creatingastaff').post(createstaff)
+
 
 
 

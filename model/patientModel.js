@@ -20,11 +20,13 @@ const   patientschema = new mongoose.Schema({
         email: {
             type: String,
             required: [true, 'Email is Required'],
-            unique: true
+            //unique: true
         },
         phoneNumber: {
             type: String,
             required: [true, 'Mobile Phone Number is Required'],
+            unique: true,
+            sparse: true,
            
         },
         bloodGroup:{
@@ -63,7 +65,8 @@ const   patientschema = new mongoose.Schema({
             type: Array, 
         },
         patientID:{
-            type:String
+            type:String,
+            unique:true
         },
     deleted:{
       type:Boolean,
@@ -76,5 +79,5 @@ const   patientschema = new mongoose.Schema({
 },{timestamps:true}
 )
 
-const patientModel = mongoose.model("patient", patientschema)
+const patientModel = mongoose.model("patien5t", patientschema)
 module.exports = patientModel

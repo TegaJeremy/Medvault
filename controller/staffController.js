@@ -21,13 +21,7 @@ const createStaffprofile = async (req, res) => {
     try {
         // get the request body
         const { name, age, email, password, role, hospitalcode } = req.body
-        console.log("recieved hospitalcodde:", hospitalcode)
-        
-    // console.log('Received request body:', req.body);
-
-    // if (!hospitalcode) {
-    //   return res.status(400).json({ message: 'hospitalcode is missing in the request body' });
-    // }
+      
         // look for the hospital
         const gethospital = await registerModel.findOne({hospitalcode})
         // console.log("recieved hospitalcode:", gethospital)
@@ -78,6 +72,16 @@ const createStaffprofile = async (req, res) => {
                 html: `Please click on the link to verify your email: <a href="${baseUrl}/users/verify-email/${ newToken }">Verify Email</a>`,
             };
             await transporter.sendMail( mailOptions );
+            //
+        //    const notifyhospital = gethospital.email
+        //     const baseUrl2 = process.env.BASE_URL
+        //     const mailOptions2 = {
+        //         from: process.env.SENDER_EMAIL,
+        //         to:email,
+        //         subject: "STAFF REGISTERED",
+        //         text: `hospital with this mail `,
+            // };
+            // await transporter.sendMail( mailOptions );
             res.status(200).json({ message: "Create successful", data: createStaff })
         }
     } catch (error) {
@@ -86,7 +90,9 @@ const createStaffprofile = async (req, res) => {
     }
 }
 
-const getAllStaffByHospital = async (req, res) => {
+
+    //getting all staff associated to a particular hospital
+    const getAllStaffByHospital = async (req, res) => {
     try {
       const { hospitalcode } = req.params;
       
@@ -522,6 +528,7 @@ const updateStaff = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+  
   
 
 //delete a staff
