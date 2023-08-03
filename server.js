@@ -9,6 +9,8 @@ const db = require('./config/Db')
  const prouter = require("./router/patientrouter")
  const staffrouter = require("./router/staff router")
  const fileUploader = require('express-fileupload')
+ const morgan = require('morgan')
+ app.use(morgan('combined'));
 // const app = express();
 
 app.use(fileUploader({

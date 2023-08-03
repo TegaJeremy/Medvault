@@ -2,10 +2,11 @@ const patientModel = require('../model/patientModel')
 const cloudinary = require('../middleware/cloudinary')
 const hospitalModel = require('../model/registrationmodel')
 const fs = require('fs')
-// const validator = require('../middleware/validation')
+const { error } = require('console')
+const validator = require('../middleware/validation')
 
 
-//creating a patient
+//creating a patient, with the hospital code 
 const createpatient = async (req, res)=>{
     try{
         const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
@@ -30,14 +31,14 @@ const createpatient = async (req, res)=>{
          return res.status(404).json({ message: "Error getting hospital. Please check ID." })
      }
     
-
-    // const validation = validator(email, phoneNumber, patientName);
-    // if (!validation.isValid) {
-    //   return res.status(400).json({
-    //     message: validation.message
-    //   });
-    // }
-
+     //validate the impute
+    const validation = validator(email, phoneNumber, patientName);
+    if (!validation.isValid) {
+      return res.status(400).json({
+        message: validation.message
+      });
+    }
+      //get a random id for the patient
              const ID = Math.floor(Math.random()*10000)
             
           //upload photo function
@@ -199,8 +200,6 @@ const createpatient = async (req, res)=>{
     //     }
     // }
  
-
-
 const updatePatient = async (req, res) => {
   try {
     const { patientID } = req.params;
@@ -228,21 +227,12 @@ const updatePatient = async (req, res) => {
       otherContacts
     } = req.body;
 
-    // Check if a new image was uploaded
-    if (req.files && req.files.patientImage) {
-      // Delete the old image from Cloudinary
-      if (patient.patientImage && patient.patientImage.public_id) {
-        await cloudinary.uploader.destroy(patient.patientImage.public_id);
-      }
-
-      // Upload the new image to Cloudinary
-      const patientphoto = await cloudinary.uploader.upload(req.files.patientImage.tempFilePath);
-      patient.patientImage = {
-        public_id: patientphoto.public_id,
-        url: patientphoto.secure_url
-      };
-    }
-
+    // const validation = validator(email, phoneNumber, patientName);
+    // if (!validation.isValid) {
+    //   return res.status(400).json({
+    //     message: validation.message
+    //   });
+    //}
     const updated = {
       patientName: patientName || patient.patientName,
       dateOfBirth: dateOfBirth || patient.dateOfBirth,
@@ -261,7 +251,18 @@ const updatePatient = async (req, res) => {
       otherContacts: otherContacts || patient.otherContacts
     };
 
-    // Perform the update and set { new: true } option to get the updated document
+    // Check if a new image was uploaded
+    if (req.files && req.files.patientImage) {
+      // Delete the old image from Cloudinary if it exists
+      if (patient.public_id) {
+        await cloudinary.uploader.destroy(patient.public_id);
+      }
+      // // Upload the new image to Cloudinary
+      const file = await cloudinary.uploader.upload(req.files.patientImage.tempFilePath);
+      updated.patientImage = file.secure_url;
+      updated.public_id = file.public_id;
+    }
+       // Perform the update and set { new: true } option to get the updated document
     const updatedPatient = await patientModel.findOneAndUpdate({ patientID }, updated, { new: true });
 
     if (!updatedPatient) {
@@ -278,7 +279,9 @@ const updatePatient = async (req, res) => {
 
 
 
-//deleting a patient
+
+//  temporarly deleting a patient from the database
+//incase of mistakes
 const deletePatient = async (req,res)=>{
     try {
         const {patientID} = req.params
@@ -289,7 +292,7 @@ const deletePatient = async (req,res)=>{
               // instead of permerneting deleting just turn the delete to false
         patient.deleted = true
         await patient.save()
-        res.status(200).json({message:"patient has been deleted"})
+        res.status(200).json({message:"patient has been temporarly deleted and will be deleted permanetly deleted in 10 days"})
         }
     
 
@@ -299,9 +302,9 @@ const deletePatient = async (req,res)=>{
     }
 }
 
-//getting all patient
 
 
+//if a patient data is mistakenly deleted it can be recovered
 //function to rcover a deleted patient
  const recoverpatient = async (req,res)=>{
     try {
@@ -352,8 +355,9 @@ const deletePatient = async (req,res)=>{
 // });
 
 
-;
 
+// this function allosw a user or admin add more infomation
+//or diagnosis to a patient
 const addDiagnosis = async (req, res) => {
   try {
     const { patientID, diagnosisText } = req.body;

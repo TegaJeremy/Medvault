@@ -16,18 +16,19 @@ const transporter = nodemailer.createTransport({
 
 
 
-// creating a registration code
+// this function is the function that registers the hopital to the platform
 const register = async (req, res)=>{
    try {
+    //getting the details fromthe request body
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
-
+        //validating the impute the user puts
     const validation = validator(email, facilityphone, facilityname);
     if (!validation.isValid) {
       return res.status(400).json({
         message: validation.message
       });
     }
-     // check if the entry email exist
+     // check if the email is been registered has already been registered
      const isEmail = await registerModel.findOne( { email } );
      if ( isEmail ) {
          res.status( 400 ).json( {
@@ -94,7 +95,7 @@ const register = async (req, res)=>{
 
 }
 
-// verify email
+// verify the email of the hospital
 const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
@@ -235,28 +236,87 @@ const resendVerificationEmail = async (req, res) => {
     }
 }
 
+
+//creating a function to logout the user
+// const logout = async (req, res) => {
+//     try {
+//       const {hospitalcode} = req.user;
+//       console.log(req.user)
+  
+//       // Update the user's token to null
+//       const user = await registerModel.findByIdAndUpdate(hospitalcode, { token: null }, { new: true });
+  
+//       if (!user) {
+//         return res.status(404).json({
+//           message: 'User not found',
+//         });
+//       }
+//       res.status(200).json({
+//         message: 'User logged out successfully',
+//       });
+//     } catch (error) {
+//       res.status(500).json({
+//         Error: error.message,
+//       });
+//     }
+//   }
+// const logout = async (req, res) => {
+  // try {
+  //   // Assuming req.user contains the user ID and token information
+  //   const { token } = req.user;
+
+  //   // Update the user's token to null in the database
+  //   // Replace 'UserModel' with the actual model representing your user collection
+  //   const updatedUser = await registerModel.findByIdAndUpdate(
+  //     token,
+  //     { token: null },
+  //     { new: true }
+  //   );
+
+  //   if (!updatedUser) {
+  //     return res.status(404).json({
+  //       message: 'User not found',
+  //     });
+  //   }
+
+  //   res.status(200).json({
+  //     message: 'User logged out successfully',
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     Error: error.message,
+  //   });
+  // }
+//};
+
 const logout = async (req, res) => {
-    try {
-      const {userId} = req.user;
-      console.log(req.user)
-  
-      // Update the user's token to null
-      const user = await registerModel.findByIdAndUpdate(userId, { token: null }, { new: true });
-  
-      if (!user) {
-        return res.status(404).json({
-          message: 'User not found',
-        });
-      }
-      res.status(200).json({
-        message: 'User logged out successfully',
-      });
-    } catch (error) {
-      res.status(500).json({
-        Error: error.message,
+  try {
+    // Assuming req.user contains the authenticated user's information
+    const { _id } = req.user;
+
+    // Update the user's token to null in the database
+    const updatedUser = await registerModel.findByIdAndUpdate(
+      _id,
+      { token: null },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: 'User not found',
       });
     }
+
+    res.status(200).json({
+      message: 'User logged out successfully',
+    });
+  } catch (error) {
+    res.status(500).json({
+      Error: error.message,
+    });
   }
+};
+
 
 //updating hospital info  
 const updatehospitalinfo = async (req, res) => {
@@ -271,7 +331,7 @@ const updatehospitalinfo = async (req, res) => {
     }
 
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
-    //validates the data passed
+   // validates the data passed
     // const validation = validator(email, facilityphone, facilityname);
     // if (!validation.isValid) {
     //   return res.status(400).json({
@@ -306,12 +366,18 @@ const updatehospitalinfo = async (req, res) => {
   }
 };
 
+
+//deleting a hospital account, note that for hospital when they want to delete their account 
+//they will send us the owmer of the application a mail, we review and revert
 const deleteAccount = async(req,res)=>{
 try {
+  //get the hospital code room header
   const {hospitalcode}= req.params
+  //find the hospital
   const deletehospital = await registerModel.findOne({hospitalcode})
+  //collect the mail from the hospital model
   const getmail = deletehospital.email
-  console.log(getmail)
+  //get th hospital code 
   const ID = deletehospital.hospitalcode
   //sending a mail
   // const baseUrl = process.env.BASE_URL
@@ -327,7 +393,10 @@ try {
 } catch (error) {
   res.status(500).json(error.message)
 }
-           
+
+//the funstion allows the hospital the hospital to send the registration link to 
+//a staff in its hospital to register with its code
+//because staff will register with the hoospital code its under           
 }
   const createstaff = async(req,res)=>{
     try {
@@ -335,7 +404,7 @@ try {
 
       const { email, hospitalcode } = req.body;
      
-      
+      //send the link of the staff registration page along sid the hospital code
       const registrationlink =`http://myplatform.com/register?hospitalcode=${hospitalcode}`
              
     

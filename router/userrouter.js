@@ -10,9 +10,15 @@ router.route("/registration").post(register)
 router.route("/verifyemail/:token").post(verifyEmail)
 router.route("/resendverificationemail").post(resendVerificationEmail)
 
+
+const { authenticateToken } = require('../middleware/auntenyicate');
+
+// Your logout route
+router.post('/logout', authenticateToken, logout);
+
 // login and logout route
 router.route("/login").post(login)
-router.route("/logout/:id").post(logout)
+router.route("/logouthospital/:hospitalcode").post(logout)
 
 // password reset and change and forgot
 router.route("/forgotpassword").post(forgotPassword)

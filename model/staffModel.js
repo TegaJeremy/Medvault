@@ -8,8 +8,7 @@ const staffSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-       // required: [true, "email required"],
-       // unique: true
+        unique: true,
     },
     password: {
         type: String,
@@ -17,7 +16,8 @@ const staffSchema = new mongoose.Schema({
        // unique: true
     },
     staffID:{
-        type:String
+        type:String,
+        unique: true,
     },
     age: {
         type: String,

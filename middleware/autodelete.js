@@ -2,6 +2,7 @@ const autopatient = require('../model/patientModel')
 
 
 //creating a function to authomatically delete
+//all the patient data that has been deleted and not recovered
 async function handleAutomatinDelete(){
     try {
         //find all patient that thedelete is true and the delete at is not set

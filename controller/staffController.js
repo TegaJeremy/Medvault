@@ -6,6 +6,7 @@ const fs = require('fs')
 const jwt = require ("jsonwebtoken")
 const bcryptjs = require("bcryptjs")
 const nodemailer= require('nodemailer')
+const validator =require('../middleware/validation')
 
 
 const transporter = nodemailer.createTransport({
@@ -17,11 +18,22 @@ const transporter = nodemailer.createTransport({
   }
   });
 
+  //this function allows the the staff to register under a hospital
+  //its under, alongside the hospital code
+  // also it will notify the hospital that a staff has been registered
 const createStaffprofile = async (req, res) => {
     try {
         // get the request body
-        const { name, age, email, password, role, hospitalcode } = req.body
-      
+        const { name, age, email, phoneNumber,password, role, hospitalcode } = req.body
+        //validates the data passed
+        // const validation = validator(email, name,phoneNumber );
+        // if (!validation.isValid) {
+        //   return res.status(400).json({
+        //     message: validation.message
+        //   });
+        //  }
+
+    
         // look for the hospital
         const gethospital = await registerModel.findOne({hospitalcode})
         // console.log("recieved hospitalcode:", gethospital)
@@ -47,11 +59,12 @@ const createStaffprofile = async (req, res) => {
             const ID = Math.floor(Math.random() * 10000)
             const data = {
                 name,
-                email,
-                staffID: ID,
                 age,
-                role,
+                email,
+                phoneNumber,
                 password: hashPass,
+                role,
+                staffID: ID,                
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
 
@@ -72,16 +85,17 @@ const createStaffprofile = async (req, res) => {
                 html: `Please click on the link to verify your email: <a href="${baseUrl}/users/verify-email/${ newToken }">Verify Email</a>`,
             };
             await transporter.sendMail( mailOptions );
-            //
-        //    const notifyhospital = gethospital.email
-        //     const baseUrl2 = process.env.BASE_URL
-        //     const mailOptions2 = {
-        //         from: process.env.SENDER_EMAIL,
-        //         to:email,
-        //         subject: "STAFF REGISTERED",
-        //         text: `hospital with this mail `,
-            // };
-            // await transporter.sendMail( mailOptions );
+            //notify the hospitay that a user has use its codes to register
+           const notifyhospital = gethospital.email
+           console.log(notifyhospital)
+            // const baseUrl2 = process.env.BASE_URL
+            const mailOptions2 = {
+                from: process.env.SENDER_EMAIL,
+                to:notifyhospital,
+                subject: "STAFF REGISTERED",
+                text: `hospital with this mail ${email} registereg with your hospital code `,
+            };
+            await transporter.sendMail( mailOptions2 );
             res.status(200).json({ message: "Create successful", data: createStaff })
         }
     } catch (error) {
@@ -92,6 +106,7 @@ const createStaffprofile = async (req, res) => {
 
 
     //getting all staff associated to a particular hospital
+    // this function allows the hospital to get all the staff registered under it
     const getAllStaffByHospital = async (req, res) => {
     try {
       const { hospitalcode } = req.params;
@@ -120,7 +135,7 @@ const createStaffprofile = async (req, res) => {
   };
   
 
-
+//verify the  email address of the new staff registered
   const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
@@ -197,138 +212,7 @@ const resendVerificationEmail = async (req, res) => {
 }
 
 
-
-//   
-
-// verify email
-// exports.staffVerify = async(req,res)=>{
-//     try {
-//         const registeredStaff = await staffModel.findById(req.params.id)
-//         const registeredToken = registeredStaff.token
-//         // check if the token attached to the user is valid
-//         await jwt.verify(registeredToken,process.env.JWT_TOKEN,(err,data)=>{
-//             if(err){res.json("This link has expired")}
-//             else {
-//                 return data
-//             }
-//         })
-//         // Update if the registered user has been verified 
-//         const verified = await staffModel.findByIdAndUpdate(req.params.id,{isVerify:true},)
-//         if(!verified){
-//             res.status(400).json({
-//                 message:"unable to verify user"
-//             })
-//         } else {
-//             res.status(200).json({
-//                 message:"user has been verified",
-//                 data: verified
-//             })
-//         }
-//     } catch (error) {
-//         res.status(400).json({
-//             message:error.message
-//         })
-//     }
-// }
-
-// // resend verification email.
-
-// exports.resendEmailVerification = async(req, res)=>{
-//     try {
-//         const { email } = req.body;
-//         const user = await staffModel.findOne({email});
-//         if (!user) {
-//             res.status(404).json({
-//                 message: 'User not found'
-//             })
-//         }else {
-//             const verified = await staffModel.findByIdAndUpdate(user._id, {verify: new true})
-//             const token = await jwt.sign({email}, process.env.JWT_TOKEN, {expiresIn: '1d'});
-//             await jwt.verify(token, process.env.JWT_TOKEN, (err)=>{
-//                 if(err) {
-//                     res.json('This Link is Expired. Please try again')
-//                 } else {   
-//                     if (!verified) {
-//                         res.status(404).json({
-//                             message: 'User is not verified yet'
-//                         })
-//                     } else {
-//                         const subject = 'Kindly RE-VERIFY'
-//                         const link = `${req.protocol}://${req.get('host')}/api/verify/${user._id}/${token}`
-//                         const message = `Welcome onBoard, kindly use this link ${link} to re-verify your account. Kindly note that this link will expire after 5(five) Minutes.`
-//                         mailSender({
-//                             email: user.email,
-//                             subject,
-//                             message
-//                         });
-//                         res.status(200).json({
-//                             message: `Verification email sent successfully to your email: ${user.email}`
-//                         })
-//                     }
-//                 }
-//             })
-//         }
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
-
-// staff signin
-// exports.signIn = async (req,res)=>{
-//     try {
-//         const {name,email,password} = req.body
-//         // validate username
-//         const isEmail = await staffModel.findOne({email})
-//         if(!isEmail){res.status(400).json({
-//             message:"Email is incorrect"
-//            }) } else {
-//         // attach the boolean value of a verified account to a variable
-//         const checkIfVerify = isEmail.verify
-//         // validate password
-//         const isPassword = await bcryptjs.compare(password, isEmail.password)
-//         if(!isPassword){res.status(400).json({
-//             message:"Incorrect Password"
-//         })} 
-//         //check if the account has been verified previously 
-//         else if (checkIfVerify==false){
-        
-//         // generate a token for the link to expire after 5 minutes
-//         const newToken = await genToken( isEmail, {expiresIn: "5m"} )
-
-//         isEmail.token = newToken
-//         // Re send link to re-verify an account that has signed up previously
-//         const subject = "Kindly Re-Verify"
-//         const link = `${req.protocol}://${req.get("host")}/api/userverify/${isEmail._id}/${newToken}`
-//         const message = `Click on the link ${link} to verify, kindly note that this link will expire after 5 minutes`
-//         sendEmail({email:isEmail.email,
-//             subject,
-//             message})
-
-//             return res.json("you havent verified your acct,check your email to reverify your account")
-//         }
-//         // update the user to logged in
-//         const userLoggedin = await userModel.findByIdAndUpdate(isEmail._id, {islogin: true});
-//        // save the generated token to "token" variable
-//        const token = await genToken( isEmail, {expiresIn: "1d"} );
-//        // return a response
-//        res.status( 200 ).json( {
-//            message: "Sign In successful",
-//            token: token,
-//            data :userLoggedin
-//        })   }
-        
-
-           
-//     } catch (error) {
-//        res.status(500).json({
-//         message:error.message
-//        }) 
-//     }
-// }
-
-
+        //login function for the staff
 const logIn = async (req, res) => {
     try {
     // Extract the user's username, email and password
@@ -396,7 +280,9 @@ const logIn = async (req, res) => {
 const signOut = async(req, res)=>{
     try {
         const { staffID } = req.body;
+        console.log()
         token = ' ';
+        console.log(token)
         const userLogout = await staffModel.findOne(staffID, {token: token}, {islogin: true});
         //const logout = await staffModel.findByIdAndUpdate(staffId, {islogin: false});
         // userLogout.token = ' ';
@@ -441,53 +327,6 @@ const signOut = async(req, res)=>{
 
 
 // update a staffs record 
-//  const updateStaff = async (req, res)=>{
-//     try {
-//         const { staffID } = req.params;
-//         const staff = await staffModel.find({staffID});
-//         const { name, email, password, role, age } = req.body;
-//         const salt = await bcryptjs.genSalt(10);
-//         const hashPassword = await bcryptjs.hash( password, salt );
-//         // const { adminId } = req.params;
-//         // const adminUser = await userModel.findById(adminId);
-//         // if (adminUser.isAdmin == false) {
-//         //     res.status(400).json({
-//         //         message: 'You are not an Admin, Therefore you are not allowed to access this'
-//         //     })
-//         // } else {
-//             const data = {
-//                 name: name || staff.name,
-//                 email: email || staff.email,
-//                 age: age || staff.age,
-//                 role: role || staff.role,
-//                 password: hashPassword || staff.password,
-//                 photo: staff.photo
-//             };
-
-//         // while updating.
-//         if (req.file && req.file.filename) {
-//             const oldPhoto = `uploads/${staff.photo}`;
-//             await fs.unlinkSync(oldPhoto)
-//             data.photo = req.file.filename
-//         }
-//             const updateStaff = await staffModel.findOneAndUpdate(staffID, data, {new: true});
-//             if (!updateStaff) {
-//                 res.status(400).json({
-//                     message: 'Failed to Update User'
-//                 })
-//             } else {
-//                 res.status(200).json({
-//                     message: 'User updated successfully',
-//                     data: updateStaff
-//                 })
-//             }
-//         } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
-
 const updateStaff = async (req, res) => {
     try {
       const { staffID } = req.params;
@@ -506,14 +345,19 @@ const updateStaff = async (req, res) => {
         age: age || staff.age,
         role: role || staff.role,
         password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : staff.password,
-        photo: staff.photo,
+        
       };
   
-      // Check if a new photo is provided in the request and update accordingly
-      if (req.file && req.file.filename) {
-        const oldPhoto = `uploads/${staff.photo}`;
-        await fs.unlinkSync(oldPhoto);
-        updateData.photo = req.file.filename;
+       // Check if a new image was uploaded
+    if (req.files && req.files.photo) {
+        // Delete the old image from Cloudinary if it exists
+        if (staff.public_id) {
+          await cloudinary.uploader.destroy(staff.public_id);
+        }
+        // // Upload the new image to Cloudinary
+        const file = await cloudinary.uploader.upload(req.files.photo.tempFilePath);
+        updateData.photo = file.secure_url;
+        updateData.public_id = file.public_id;
       }
   
       // Perform the update and set { new: true } option to get the updated document
@@ -537,7 +381,7 @@ const deleteStaff = async (req, res) => {
         const { hospitalcode } = req.params;
         const Admin = await registerModel.findOne({ hospitalcode });
         const isAdmin = Admin.hospitalcode; 
-        console.log(isAdmin)
+        
   
       if (!isAdmin) {
        return  res.status(404).json({ message: 'you are not allowed to perform this function' });
@@ -546,10 +390,10 @@ const deleteStaff = async (req, res) => {
       const {staffID}= req.params
       const staff = await staffModel.findOne({staffID})
       
-      if(!staff)(
-          res.status(404).json({message:"the staff with this id is not found"})
-      )
-  
+      if (!staff) {
+        return res.status(404).json({ message: "the staff with this id is not found" });
+    }
+    
       // Delete the staff member
       await staffModel.findOneAndDelete({ staffID });
       // Remove the staff's photo from Cloudinary if it exists
@@ -573,7 +417,7 @@ const deleteStaff = async (req, res) => {
   };
   
 
-// get one staff
+// getting one staff by the staffid
  const getOne = async (req, res)=>{
     try {
         const {staffID} = req.params;
