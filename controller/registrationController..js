@@ -73,7 +73,9 @@ const register = async (req, res)=>{
           from: process.env.SENDER_EMAIL,
           to: email,
           subject: "Verify your account",
-          html: `Please click on the link to verify your email: <a href="${baseUrl}/users/verify-email/${ token }">Verify Email</a>`,
+         // html: `Please click on the link to verify your email: http://localhost:5173/verification/${ token }">Verify Email</a>`,
+          html: `Please click on the link to verify your email: <a href="http://localhost:5173/verification/${token}">Verify Email</a>`,
+
       };
       await transporter.sendMail( mailOptions );
             // save the user
