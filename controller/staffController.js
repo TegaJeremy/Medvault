@@ -64,6 +64,7 @@ const createStaffprofile = async (req, res) => {
                 phoneNumber,
                 password: hashPass,
                 role,
+                hospitalcode,
                 staffID: ID,                
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }

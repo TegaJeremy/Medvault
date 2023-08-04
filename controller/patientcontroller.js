@@ -65,12 +65,11 @@ const createpatient = async (req, res)=>{
             spouseName,
             spousePhonenumber,
             otherContacts,
-            diagnosis,
+             diagnosis,
             patientID:ID,
+            hospitalcode,
             patientImage: {public_id:patientphoto.public_id,
-                url:patientphoto.url}
-          
-          
+                url:patientphoto.url}  
             })
           const patientInfo = await patientProfile.save();
              if(patientInfo){

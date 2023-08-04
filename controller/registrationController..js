@@ -3,7 +3,9 @@ const staffModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
-const validator = require('../middleware/validation')
+// const validator = require('../middleware/validation')
+const Validator = require('fastest-validator');
+
 
 const transporter = nodemailer.createTransport({
     service:"Gmail",
@@ -21,13 +23,40 @@ const register = async (req, res)=>{
    try {
     //getting the details fromthe request body
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
+  
+
+    //const v = new Validator();
+    
+    // const validateSchema = {
+    //   facilityname: { type: 'string', empty: false, messages: { stringEmpty: 'Facility name is required' } },
+    //   facilityaddress: { type: 'string', empty: false, messages: { stringEmpty: 'Facility address is required' } },
+    //   email: { type: 'email', empty: false, messages: { stringEmpty: 'Email is required', invalidEmail: 'Invalid email format' } },
+    //   password: { type: 'string', empty: false, messages: { stringEmpty: 'Password is required' } },
+    //   facilityphone: { type: 'string', empty: false, messages: { stringEmpty: 'Facility phone is required' } },
+    //   state: { type: 'string', empty: false, messages: { stringEmpty: 'State is required' } },
+    //   city: { type: 'string', empty: false, messages: { stringEmpty: 'City is required' } },
+    //   LGA: { type: 'string', empty: false, messages: { stringEmpty: 'LGA is required' } },
+    //   hospitalcode: { type: 'string', empty: false, messages: { stringEmpty: 'Hospital code is required' } },
+    // };
+    
+    // const v = new Validator();
+    
+    // const validate = v.validate(input, registrationSchema);
+    
+    // if (validationErrors) {
+    //   const errorMessages = validationErrors.map((error) => error.message).join(', ');
+    //   console.error('Validation Error:', errorMessages);
+    // } else {
+    //   console.log('Validation Successful');
+    
+    
         //validating the impute the user puts
-    const validation = validator(email, facilityphone, facilityname);
-    if (!validation.isValid) {
-      return res.status(400).json({
-        message: validation.message
-      });
-    }
+    // const validation = validator(email, facilityphone, facilityname);
+    // if (!validation.isValid) {
+    //   return res.status(400).json({
+    //     message: validation.message
+    //   });
+     //}
      // check if the email is been registered has already been registered
      const isEmail = await registerModel.findOne( { email } );
      if ( isEmail ) {
@@ -56,7 +85,7 @@ const register = async (req, res)=>{
     let ID = Math.floor(Math.random()* 10000)
       
       //creating a new data
-    const user = new registerModel( {
+    const user = registerModel( {
         facilityname, 
         facilityaddress,
         email,
@@ -67,6 +96,33 @@ const register = async (req, res)=>{
         LGA,
         hospitalcode:ID
     })
+    const validateSchema = {
+      facilityname: { type: 'string', empty: false, messages: { stringEmpty: 'Facility name is required' } },
+      facilityaddress: { type: 'string',max:15,min:1, empty: false, messages: { stringEmpty: 'Facility address is required' } },
+      email: { type: 'email', empty: false, messages: { stringEmpty: 'Email is required', invalidEmail: 'Invalid email format' } },
+      password: { type: 'string', empty: false, messages: { stringEmpty: 'Password is required' } },
+      facilityphone: { type: 'string', empty: false, messages: { stringEmpty: 'Facility phone is required' } },
+      state: { type: 'string', empty: false, messages: { stringEmpty: 'State is required' } },
+      city: { type: 'string', empty: false, messages: { stringEmpty: 'City is required' } },
+      LGA: { type: 'string', empty: false, messages: { stringEmpty: 'LGA is required' } },
+      hospitalcode: { type: 'string', empty: false, messages: { stringEmpty: 'Hospital code is required' } },
+    };
+    
+    const v = new Validator();
+    const validate = v.validate( user, validateSchema);
+    
+    // if (validationErrors) {
+    //   const errorMessages = validationErrors.map((error) => error.message).join(', ');
+    //   console.error('Validation Error:', errorMessages);
+    // } else {
+    //   console.log('Validation Successful');
+
+    const savedUser = await registerModel.create(user)
+    if(validate !==true){
+      return res.status(400).json({message:"erroe trying to validate user",
+         error:validate[0].message
+      })
+    }
       // send verification email
       const baseUrl = process.env.BASE_URL
       const mailOptions = {
@@ -74,29 +130,32 @@ const register = async (req, res)=>{
           to: email,
           subject: "Verify your account",
          // html: `Please click on the link to verify your email: http://localhost:5173/verification/${ token }">Verify Email</a>`,
-          html: `Please click on the link to verify your email: <a href="http://localhost:5173/verification/${token}">Verify Email</a>`,
+          html: `Please click on the link to verify your email: <a href="http://localhost:5173/verification?token=${token}">Verify Email</a>`,
 
       };
-      console.log(mailOptions.html)
+      
       await transporter.sendMail( mailOptions );
             // save the user
             user.isAdmin=true
-            const savedUser = await user.save();
+            const newsavedUser = await user.save();
 
             // return a response
             res.status( 201 ).json( {
-            message: `Check your email: ${savedUser.email} to verify your account.`,
+            message: `Check your email: ${newsavedUser.email} to verify your account.`,
             data: savedUser,
             token })
             
   }
-    
+   
+
+
    } catch (error) {
     res.status(500).json(error.message)
    }
 
 
 }
+
 
 // verify the email of the hospital
 const verifyEmail = async (req, res) => {

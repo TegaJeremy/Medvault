@@ -1,6 +1,6 @@
 const validator = require ('validator')
 
-const validateEmailAndPhone = (email, phoneNumber, patientName) => {
+const validateEmailAndPhone = (email, phoneNumber, patientName, password) => {
     if (!validator.isEmail(email)) {
         return {
             isValid: false,
@@ -23,6 +23,12 @@ const validateEmailAndPhone = (email, phoneNumber, patientName) => {
             message: 'Invalid Name Format. Only letters and spaces are allowed.'
         };
     }
+    // if (!stringPattern.test(password)) {
+    //     return {
+    //         isValid: false,
+    //         message: 'Invalid Name Format. Only letters and spaces are allowed.'
+    //     };
+    // }
 
     return {
         isValid: true

@@ -32,11 +32,7 @@ const   patientschema = new mongoose.Schema({
         bloodGroup:{
             type:String
         },
-        patientImage: {
-                public_id: { type: String},
-                 url:{ type: String, }
-               
-        },
+       
         fathersName: {
             type: String,
         },
@@ -68,6 +64,14 @@ const   patientschema = new mongoose.Schema({
             type:String,
             unique:true
         },
+        hospitalcode: {
+        type:String,
+            },
+        patientImage: {
+            public_id: { type: String},
+             url:{ type: String, }
+                       },
+        
     deleted:{
       type:Boolean,
       default:false
