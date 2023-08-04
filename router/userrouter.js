@@ -7,7 +7,7 @@ const router = express.Router()
 
 // route for Registration and email verification
 router.route("/registration").post(register)
-router.route("/verifyemail/:token").post(verifyEmail)
+router.route("/verifyemail/:token").get(verifyEmail)
 router.route("/resendverificationemail").post(resendVerificationEmail)
 
 

@@ -68,5 +68,5 @@ isSuperAdmin:{
 },{timestamps:true}
 )
 
-const registerModel = mongoose.model("HOSPITALs", registerschema)
+const registerModel = mongoose.model("HOSPITA", registerschema)
 module.exports = registerModel

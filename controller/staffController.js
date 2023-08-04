@@ -25,14 +25,29 @@ const createStaffprofile = async (req, res) => {
     try {
         // get the request body
         const { name, age, email, phoneNumber,password, role, hospitalcode } = req.body
-        //validates the data passed
-        // const validation = validator(email, name,phoneNumber );
-        // if (!validation.isValid) {
-        //   return res.status(400).json({
-        //     message: validation.message
-        //   });
-        //  }
-
+        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!name || name?.trim().length === 0){
+          return res.status(404).json({message:"name imput cannot be epmyt"})
+        }  
+        if(!age || age?.trim().length === 0){
+          return res.status(404).json({message:"age cannot be empty"})
+        } 
+        if(!email || !emailPattern?.test(email)){
+          return res.status(404).json({message:"email not valid"})
+        }
+        if(!password || password?.trim().length === 0 || password?.trim().length > 15){
+          return res.status(404).json({message:" password should not be empty or more than 15 characters"})
+        } 
+        if(!phoneNumber || phoneNumber?.trim().length === 0  ){
+          return res.status(404).json({message:" phoneNumber pattern not supported"})
+        }
+        if(!role){
+            return res.status(404).json({message:" role cannot be empty"})
+          }
+        if(!hospitalcode || hospitalcode?.trim().length === 0){
+          return res.status(404).json({message:" hospitalcode should not be empty"})
+        }
+        
     
         // look for the hospital
         const gethospital = await registerModel.findOne({hospitalcode})
@@ -337,7 +352,23 @@ const updateStaff = async (req, res) => {
         return res.status(404).json({ message: 'Staff not found' });
       }
   
-      const { name, email, password, role, age } = req.body;
+      const { name, email, role, age } = req.body;
+      let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if( name?.trim().length === 0){
+        return res.status(404).json({message:"name imput cannot be epmyt"})
+      }  
+      if( age?.trim().length === 0){
+        return res.status(404).json({message:"age cannot be empty"})
+      } 
+      if(emailPattern?.test(email)){
+        return res.status(404).json({message:"email not valid"})
+      } 
+      if(phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+        return res.status(404).json({message:" phoneNumber pattern not supported"})
+      }
+      if(hospitalcode?.trim().length === 0){
+        return res.status(404).json({message:" hospitalcode should not be empty"})
+      }
   
       // Prepare the fields to be updated
       const updateData = {
@@ -345,7 +376,7 @@ const updateStaff = async (req, res) => {
         email: email || staff.email,
         age: age || staff.age,
         role: role || staff.role,
-        password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : staff.password,
+        //password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : staff.password,
         
       };
   

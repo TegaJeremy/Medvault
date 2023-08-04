@@ -23,33 +23,33 @@ const register = async (req, res)=>{
    try {
     //getting the details fromthe request body
     const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
-  
 
-    //const v = new Validator();
-    
-    // const validateSchema = {
-    //   facilityname: { type: 'string', empty: false, messages: { stringEmpty: 'Facility name is required' } },
-    //   facilityaddress: { type: 'string', empty: false, messages: { stringEmpty: 'Facility address is required' } },
-    //   email: { type: 'email', empty: false, messages: { stringEmpty: 'Email is required', invalidEmail: 'Invalid email format' } },
-    //   password: { type: 'string', empty: false, messages: { stringEmpty: 'Password is required' } },
-    //   facilityphone: { type: 'string', empty: false, messages: { stringEmpty: 'Facility phone is required' } },
-    //   state: { type: 'string', empty: false, messages: { stringEmpty: 'State is required' } },
-    //   city: { type: 'string', empty: false, messages: { stringEmpty: 'City is required' } },
-    //   LGA: { type: 'string', empty: false, messages: { stringEmpty: 'LGA is required' } },
-    //   hospitalcode: { type: 'string', empty: false, messages: { stringEmpty: 'Hospital code is required' } },
-    // };
-    
-    // const v = new Validator();
-    
-    // const validate = v.validate(input, registrationSchema);
-    
-    // if (validationErrors) {
-    //   const errorMessages = validationErrors.map((error) => error.message).join(', ');
-    //   console.error('Validation Error:', errorMessages);
-    // } else {
-    //   console.log('Validation Successful');
-    
-    
+    //check and validate the impute of the user
+       let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!facilityname || facilityname?.trim().length === 0){
+          return res.status(404).json({message:"facility name cannot be empty"})
+        }  
+        if(!facilityaddress || facilityaddress?.trim().length === 0){
+          return res.status(404).json({message:"facility address cannot be empty"})
+        } 
+        if(!email || !emailPattern?.test(email)){
+          return res.status(404).json({message:"email pattern not valid"})
+        }
+        if(!password || password?.trim().length === 0 || password?.trim().length > 15){
+          return res.status(404).json({message:" password should not be empty or more than 15 characters"})
+        } 
+        if(!facilityphone || facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+          return res.status(404).json({message:" facilityphone phone should not be empty or more than 15 character"})
+        }
+        if(!city || city?.trim().length === 0){
+          return res.status(404).json({message:" city field should not be empty"})
+        }
+        if(!state || state?.trim().length === 0){
+          return res.status(404).json({message:" state field should be empty"})
+        }
+        if(!LGA || LGA?.trim().length === 0){
+          return res.status(404).json({message:" LGA should be empty"})
+        }
         //validating the impute the user puts
     // const validation = validator(email, facilityphone, facilityname);
     // if (!validation.isValid) {
@@ -72,7 +72,7 @@ const register = async (req, res)=>{
     //hash the password using bcrypt
     const hashedPassword  = bcrypt.hashSync(password, salt)
       // create a token
-      const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "30m" } );
+      const token = jwt.sign( { email }, process.env.secretKey, { expiresIn: "30m" } );
       //creating a function that will generate random id for the hospitals
       
     //   function generateID(){
@@ -85,7 +85,7 @@ const register = async (req, res)=>{
     let ID = Math.floor(Math.random()* 10000)
       
       //creating a new data
-    const user = registerModel( {
+    const user =  new registerModel( {
         facilityname, 
         facilityaddress,
         email,
@@ -96,60 +96,99 @@ const register = async (req, res)=>{
         LGA,
         hospitalcode:ID
     })
-    const validateSchema = {
-      facilityname: { type: 'string', empty: false, messages: { stringEmpty: 'Facility name is required' } },
-      facilityaddress: { type: 'string',max:15,min:1, empty: false, messages: { stringEmpty: 'Facility address is required' } },
-      email: { type: 'email', empty: false, messages: { stringEmpty: 'Email is required', invalidEmail: 'Invalid email format' } },
-      password: { type: 'string', empty: false, messages: { stringEmpty: 'Password is required' } },
-      facilityphone: { type: 'string', empty: false, messages: { stringEmpty: 'Facility phone is required' } },
-      state: { type: 'string', empty: false, messages: { stringEmpty: 'State is required' } },
-      city: { type: 'string', empty: false, messages: { stringEmpty: 'City is required' } },
-      LGA: { type: 'string', empty: false, messages: { stringEmpty: 'LGA is required' } },
-      hospitalcode: { type: 'string', empty: false, messages: { stringEmpty: 'Hospital code is required' } },
-    };
     
-    const v = new Validator();
-    const validate = v.validate( user, validateSchema);
-    
-    // if (validationErrors) {
-    //   const errorMessages = validationErrors.map((error) => error.message).join(', ');
-    //   console.error('Validation Error:', errorMessages);
-    // } else {
-    //   console.log('Validation Successful');
+      // return res.status(400).json({message:"erroe trying to validate user",
+      //    error:validate[0].message
+      // })
+      // const baseUrl = process.env.BASE_URL
+      // const link = `http://localhost:5173/verification?token=${token}`
+      // const mailOptions = {
+      //     from: process.env.SENDER_EMAIL,
+      //     to: email,
+      //     subject: "Verify your account",
+          
+      //    // html: `Please click on the link to verify your email: http://localhost:5173/verification/${ token }">Verify Email</a>`,
+      //    // html: `Please click on the link to verify your email: <a href=">Verify Email</a>`,
+      //    text: `plase click on the link to verify your account${link}`
 
-    const savedUser = await registerModel.create(user)
-    if(validate !==true){
-      return res.status(400).json({message:"erroe trying to validate user",
-         error:validate[0].message
-      })
-    }
-      // send verification email
-      const baseUrl = process.env.BASE_URL
-      const mailOptions = {
-          from: process.env.SENDER_EMAIL,
-          to: email,
-          subject: "Verify your account",
-         // html: `Please click on the link to verify your email: http://localhost:5173/verification/${ token }">Verify Email</a>`,
-          html: `Please click on the link to verify your email: <a href="http://localhost:5173/verification?token=${token}">Verify Email</a>`,
+      // };
+      const baseUrl = process.env.BASE_URL;
+// const link = `http://localhost:5173/verification?token=${token}`;
+const link = `http://www.google.com`
+const mailOptions = {
+    from: process.env.SENDER_EMAIL,
+    to: email,
+    subject: "Verify your account",
+    html: `
+        <html>
+        <head>
+            <style>
+                /* Add your CSS styles here */
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    background-color: #f4f4f4;
+                    padding: 20px;
+                }
+                .header {
+                    background-color: #007BFF;
+                    color: #fff;
+                    padding: 10px;
+                    text-align: center;
+                }
+                .content {
+                    padding: 20px;
+                }
+                .button {
+                    background-color: #007BFF;
+                    border: none;
+                    color: #fff;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 16px;
+                    border-radius: 5px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Verify Your Account</h1>
+                </div>
+                <div class="content">
+                    <p>Please click on the link below to verify your account:</p>
+                    <a class="button" href="${link}">Verify Email</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `
+};
 
-      };
+// Use the 'mailOptions' object in your email sending code
+
       
       await transporter.sendMail( mailOptions );
             // save the user
             user.isAdmin=true
-            const newsavedUser = await user.save();
+            const savedUser = await user.save();
 
             // return a response
             res.status( 201 ).json( {
-            message: `Check your email: ${newsavedUser.email} to verify your account.`,
+            message: `Check your email: ${savedUser.email} to verify your account.`,
             data: savedUser,
             token })
+    }
+      // send verification email
+    
             
   }
-   
-
-
-   } catch (error) {
+    catch (error) {
     res.status(500).json(error.message)
    }
 
@@ -392,7 +431,30 @@ const updatehospitalinfo = async (req, res) => {
       return res.status(404).json({ message: 'hospital not foung, please check the hospital code passed' });
     }
 
-    const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
+    const  {facilityname, facilityaddress, email, facilityphone, state, city , LGA,} = req.body
+      //check and validate the impute of the user
+      let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if( facilityname?.trim().length === 0){
+        return res.status(404).json({message:"facility name cannot be empty"})
+      }  
+      if(facilityaddress?.trim().length === 0){
+        return res.status(404).json({message:"facility address cannot be empty"})
+      } 
+      if(emailPattern?.test(email)){
+        return res.status(404).json({message:"email pattern not valid"})
+      }
+      if(facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+        return res.status(404).json({message:" facilityphone phone should not be empty or more than 15 character"})
+      }
+      if(city?.trim().length === 0){
+        return res.status(404).json({message:" city field should not be empty"})
+      }
+      if(state?.trim().length === 0){
+        return res.status(404).json({message:" state field should be empty"})
+      }
+      if(LGA?.trim().length === 0){
+        return res.status(404).json({message:" LGA should be empty"})
+      }
    // validates the data passed
     // const validation = validator(email, facilityphone, facilityname);
     // if (!validation.isValid) {
@@ -406,16 +468,13 @@ const updatehospitalinfo = async (req, res) => {
       facilityname: facilityname || hospital.facilityname,
       facilityaddress: facilityaddress || hospital.facilityaddress,
       email: email || hospital.email,
-      password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : hospital.password,
+      //password: password ? await bcryptjs.hash(password, await bcryptjs.genSalt(10)) : hospital.password,
       facilityphone: facilityphone || hospital.facilityphone,
       state: state || hospital.state,
       city: city || hospital.city,
       LGA: LGA || hospital.LGA,
     };
-
-    
-
-    // Perform the update and set { new: true } option to get the updated document
+       // Perform the update and set { new: true } option to get the updated document
     const updatedhospital = await registerModel.findOneAndUpdate({ hospitalcode }, updateData, { new: true });
 
     if (!updatedhospital) {

@@ -3,7 +3,7 @@ const cloudinary = require('../middleware/cloudinary')
 const hospitalModel = require('../model/registrationmodel')
 const fs = require('fs')
 const { error } = require('console')
-const validator = require('../middleware/validation')
+//const validator = require('../middleware/validation')
 
 
 //creating a patient, with the hospital code 
@@ -11,6 +11,53 @@ const createpatient = async (req, res)=>{
     try{
         const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
             MothersPhonenumber,relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
+            //validate the impute and give necessary response
+            if(!patientName || natientNameme?.trim().length === 0){
+              return res.status(404).json({message:"patientname imput cannot be epmyt"})
+            }  
+            if(!dateOfBirth || dateOfBirth?.trim().length === 0){
+              return res.status(404).json({message:" date of birth cannot be empty"})
+            } 
+            if(!gender || gender?.trim().length === 0){
+              return res.status(404).json({message:"age cannot be empty"})
+            } 
+            if(!email || !emailPattern?.test(email)){
+              return res.status(404).json({message:"email not valid"})
+            }
+            if(!homeAddress || homeAddress?.trim().length === 0){
+              return res.status(404).json({message:"age cannot be empty"})
+            } 
+            if(!bloodGroup || bloodGroup?.trim().length === 0){
+              return res.status(404).json({message:"bloodGroup cannot be empty"})
+            } 
+            if(!fathersName){
+              return res.status(404).json({message:"fathersName cannot be empty"})
+            } 
+            if(!mothersName){
+              return res.status(404).json({message:"mothersName cannot be empty"})
+            } 
+            if(!MothersPhonenumber){
+              return res.status(404).json({message:"MothersPhonenumber cannot be empty"})
+            } 
+            if(!relationshipStatus){
+              return res.status(404).json({message:"relationshipStatus cannot be empty"})
+            } 
+            if(!otherContacts){
+              return res.status(404).json({message:"otherContacts cannot be empty"})
+            } 
+            if(!diagnosis){
+              return res.status(404).json({message:"diagnosis cannot be empty"})
+            } 
+            
+            if(!fathersPhonenumber){
+              return res.status(404).json({message:"fathersPhonenumber cannot be empty"})
+            }
+            if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+              return res.status(404).json({message:" phoneNumber pattern not supported"})
+            }
+            if(!hospitalcode || hospitalcode?.trim().length === 0){
+              return res.status(404).json({message:" hospitalcode should not be empty"})
+            }
              // Check if the email is already taken
     const existingPatient = await patientModel.findOne({ email });
     if (existingPatient) {
@@ -225,6 +272,54 @@ const updatePatient = async (req, res) => {
       spousePhonenumber,
       otherContacts
     } = req.body;
+
+    //validate the impute
+    if(!patientName || natientNameme?.trim().length === 0){
+      return res.status(404).json({message:"patientname imput cannot be epmyt"})
+    }  
+    if(!dateOfBirth || dateOfBirth?.trim().length === 0){
+      return res.status(404).json({message:" date of birth cannot be empty"})
+    } 
+    if(!gender || gender?.trim().length === 0){
+      return res.status(404).json({message:"age cannot be empty"})
+    } 
+    if(!email || !emailPattern?.test(email)){
+      return res.status(404).json({message:"email not valid"})
+    }
+    if(!homeAddress || homeAddress?.trim().length === 0){
+      return res.status(404).json({message:"age cannot be empty"})
+    } 
+    if(!bloodGroup || bloodGroup?.trim().length === 0){
+      return res.status(404).json({message:"bloodGroup cannot be empty"})
+    } 
+    if(!fathersName){
+      return res.status(404).json({message:"fathersName cannot be empty"})
+    } 
+    if(!mothersName){
+      return res.status(404).json({message:"mothersName cannot be empty"})
+    } 
+    if(!MothersPhonenumber){
+      return res.status(404).json({message:"MothersPhonenumber cannot be empty"})
+    } 
+    if(!relationshipStatus){
+      return res.status(404).json({message:"relationshipStatus cannot be empty"})
+    } 
+    if(!otherContacts){
+      return res.status(404).json({message:"otherContacts cannot be empty"})
+    } 
+    if(!diagnosis){
+      return res.status(404).json({message:"diagnosis cannot be empty"})
+    } 
+    
+    if(!fathersPhonenumber){
+      return res.status(404).json({message:"fathersPhonenumber cannot be empty"})
+    }
+    if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+      return res.status(404).json({message:" phoneNumber pattern not supported"})
+    }
+    if(hospitalcode?.trim().length === 0){
+      return res.status(404).json({message:" hospitalcode should not be empty"})
+    }
 
     // const validation = validator(email, phoneNumber, patientName);
     // if (!validation.isValid) {
