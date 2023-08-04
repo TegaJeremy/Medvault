@@ -77,6 +77,7 @@ const register = async (req, res)=>{
           html: `Please click on the link to verify your email: <a href="http://localhost:5173/verification/${token}">Verify Email</a>`,
 
       };
+      console.log(mailOptions.html)
       await transporter.sendMail( mailOptions );
             // save the user
             user.isAdmin=true
@@ -294,11 +295,11 @@ const resendVerificationEmail = async (req, res) => {
 const logout = async (req, res) => {
   try {
     // Assuming req.user contains the authenticated user's information
-    const { _id } = req.user;
-
+    const { hospitalcode } = req.params.hospitalcode;
+    console.log(req.user)
     // Update the user's token to null in the database
     const updatedUser = await registerModel.findByIdAndUpdate(
-      _id,
+      hospitalcode,
       { token: null },
       { new: true }
     );
@@ -426,7 +427,7 @@ try {
         message: `email sent successfully sent to staff: `
         
     } );
-      
+       
       
     } catch (error) {
       res.status(500).json(error.message)

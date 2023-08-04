@@ -366,7 +366,7 @@ const addDiagnosis = async (req, res) => {
     const patient = await patientModel.findOne({patientID});
 
     if (!patient) {
-      // If patient with the given ID is not found, handle the error accordingly
+      // If patient with the given ID is not found, handle the error accordi ngly
       res.status(404).json({message:"error finding patient"})
     }
          
