@@ -14,7 +14,7 @@ router.route("/resendverificationemail").post(resendVerificationEmail)
 const { authenticateToken } = require('../middleware/auntenyicate');
 
 // Your logout route
-router.post('/logout', authenticateToken, logout);
+
 
 // login and logout route
 router.route("/login").post(login)

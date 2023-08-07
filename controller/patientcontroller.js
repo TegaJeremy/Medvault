@@ -9,8 +9,8 @@ const { error } = require('console')
 //creating a patient, with the hospital code 
 const createpatient = async (req, res)=>{
     try{
-        const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
-            MothersPhonenumber,relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
+        const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,
+            relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
             //validate the impute and give necessary response
             if(!patientName || natientNameme?.trim().length === 0){
               return res.status(404).json({message:"patientname imput cannot be epmyt"})
@@ -29,15 +29,6 @@ const createpatient = async (req, res)=>{
             } 
             if(!bloodGroup || bloodGroup?.trim().length === 0){
               return res.status(404).json({message:"bloodGroup cannot be empty"})
-            } 
-            if(!fathersName){
-              return res.status(404).json({message:"fathersName cannot be empty"})
-            } 
-            if(!mothersName){
-              return res.status(404).json({message:"mothersName cannot be empty"})
-            } 
-            if(!MothersPhonenumber){
-              return res.status(404).json({message:"MothersPhonenumber cannot be empty"})
             } 
             if(!relationshipStatus){
               return res.status(404).json({message:"relationshipStatus cannot be empty"})
@@ -76,16 +67,8 @@ const createpatient = async (req, res)=>{
      const gethospital = await hospitalModel.findOne({hospitalcode})
      if (!gethospital) {
          return res.status(404).json({ message: "Error getting hospital. Please check ID." })
-     }
-    
-     //validate the impute
-    const validation = validator(email, phoneNumber, patientName);
-    if (!validation.isValid) {
-      return res.status(400).json({
-        message: validation.message
-      });
-    }
-      //get a random id for the patient
+     }    
+  //get a random id for the patient
              const ID = Math.floor(Math.random()*10000)
             
           //upload photo function
@@ -104,10 +87,6 @@ const createpatient = async (req, res)=>{
             email,
            phoneNumber,
             bloodGroup,
-            fathersName,
-            fathersPhonenumber,
-            mothersName,
-            MothersPhonenumber,
             relationshipStatus,
             spouseName,
             spousePhonenumber,
@@ -263,11 +242,7 @@ const updatePatient = async (req, res) => {
       email,
       phoneNumber,
       bloodGroup,
-      fathersName,
-      fathersPhonenumber,
-      mothersName,
-      mothersPhonenumber,
-      relationshipStatus,
+     relationshipStatus,
       spouseName,
       spousePhonenumber,
       otherContacts
@@ -292,16 +267,7 @@ const updatePatient = async (req, res) => {
     if(!bloodGroup || bloodGroup?.trim().length === 0){
       return res.status(404).json({message:"bloodGroup cannot be empty"})
     } 
-    if(!fathersName){
-      return res.status(404).json({message:"fathersName cannot be empty"})
-    } 
-    if(!mothersName){
-      return res.status(404).json({message:"mothersName cannot be empty"})
-    } 
-    if(!MothersPhonenumber){
-      return res.status(404).json({message:"MothersPhonenumber cannot be empty"})
-    } 
-    if(!relationshipStatus){
+     if(!relationshipStatus){
       return res.status(404).json({message:"relationshipStatus cannot be empty"})
     } 
     if(!otherContacts){
@@ -310,10 +276,6 @@ const updatePatient = async (req, res) => {
     if(!diagnosis){
       return res.status(404).json({message:"diagnosis cannot be empty"})
     } 
-    
-    if(!fathersPhonenumber){
-      return res.status(404).json({message:"fathersPhonenumber cannot be empty"})
-    }
     if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
       return res.status(404).json({message:" phoneNumber pattern not supported"})
     }
@@ -335,11 +297,7 @@ const updatePatient = async (req, res) => {
       email: email || patient.email,
       phoneNumber: phoneNumber || patient.phoneNumber,
       bloodGroup: bloodGroup || patient.bloodGroup,
-      fathersName: fathersName || patient.fathersName,
-      fathersPhonenumber: fathersPhonenumber || patient.fathersPhonenumber,
-      mothersName: mothersName || patient.mothersName,
-      mothersPhonenumber: mothersPhonenumber || patient.mothersPhonenumber,
-      relationshipStatus: relationshipStatus || patient.relationshipStatus,
+       relationshipStatus: relationshipStatus || patient.relationshipStatus,
       spouseName: spouseName || patient.spouseName,
       spousePhonenumber: spousePhonenumber || patient.spousePhonenumber,
       otherContacts: otherContacts || patient.otherContacts
@@ -347,6 +305,7 @@ const updatePatient = async (req, res) => {
 
     // Check if a new image was uploaded
     if (req.files && req.files.patientImage) {
+      console.log(profile[0].patientphoto)
       // Delete the old image from Cloudinary if it exists
       if (patient.public_id) {
         await cloudinary.uploader.destroy(patient.public_id);

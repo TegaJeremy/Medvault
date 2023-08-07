@@ -29,23 +29,7 @@ const   patientschema = new mongoose.Schema({
             sparse: true,
            
         },
-        bloodGroup:{
-            type:String
-        },
-       
-        fathersName: {
-            type: String,
-        },
-        fathersPhonenumber: {
-            type: String,
-        },
-        mothersName: {
-            type: String,
-        },
-        MothersPhonenumber: {
-            type: String,
-        },
-        relationshipStatus: {
+       relationshipStatus: {
             type: String,
         },
        spouseName: {
