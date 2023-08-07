@@ -50,7 +50,7 @@ const staffSchema = new mongoose.Schema({
     
 }, {timestamps: true})
 
-const adminModel = mongoose.model('staff', staffSchema)
+const adminModel = mongoose.model('staff2', staffSchema)
 
 
 module.exports = adminModel

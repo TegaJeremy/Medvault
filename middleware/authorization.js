@@ -83,8 +83,9 @@ const checkUser = (req, res, next) => {
        const { id } = req.params;
     //    const id = req.staff.userid.userId
        const user = await staffModel.findById(id)
+       console.log(user)
        // console.log(req.staff.userid)
-        if(user.isStaff === false) {
+        if(user.isStaff === true) {
             next()
         } else {
             res.status(400).json({

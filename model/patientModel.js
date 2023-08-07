@@ -67,5 +67,5 @@ const   patientschema = new mongoose.Schema({
 },{timestamps:true}
 )
 
-const patientModel = mongoose.model("patien5t", patientschema)
+const patientModel = mongoose.model("new patient", patientschema)
 module.exports = patientModel
