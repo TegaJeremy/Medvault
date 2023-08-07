@@ -11,8 +11,9 @@ const createpatient = async (req, res)=>{
     try{
         const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,
             relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             //validate the impute and give necessary response
-            if(!patientName || natientNameme?.trim().length === 0){
+            if(!patientName || patientName?.trim().length === 0){
               return res.status(404).json({message:"patientname imput cannot be epmyt"})
             }  
             if(!dateOfBirth || dateOfBirth?.trim().length === 0){
@@ -38,12 +39,8 @@ const createpatient = async (req, res)=>{
             } 
             if(!diagnosis){
               return res.status(404).json({message:"diagnosis cannot be empty"})
-            } 
-            
-            if(!fathersPhonenumber){
-              return res.status(404).json({message:"fathersPhonenumber cannot be empty"})
             }
-            if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+            if(!phoneNumber||phoneNumber?.trim().length >15 ){
               return res.status(404).json({message:" phoneNumber pattern not supported"})
             }
             if(!hospitalcode || hospitalcode?.trim().length === 0){

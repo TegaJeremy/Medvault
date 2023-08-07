@@ -39,7 +39,7 @@ const staffSchema = new mongoose.Schema({
     hospitalcode:{
         type:String
     },
-    isAdmin: {
+    isStaff: {
         type: Boolean,
         default: false
     },

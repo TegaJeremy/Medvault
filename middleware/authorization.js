@@ -5,28 +5,28 @@ const staffModel = require('../model/staffModel');
 // To authenticate a user token in the database
 const authentication = async (req, res, next) => {
     try {
-        const user = await userModel.findById(req.params.adminId);
+        const staff = await staffModel.findById(req.params.id);
 
-        if(!user) {
+        if(!staff) {
             return res.status(400).json({
                 message: 'Admin Authentication Failed: Admin not found'
             })
         }
 
-        const userToken = user.token
+        const staffToken = staff.token
 
-        if(!userToken) {
+        if(!staffToken) {
             return res.status(400).json({
-                message: 'Admin Authentication Failed: Please sign in.'
+                message: 'Authentication Failed: Please sign in.'
             })
         }
 
-        await jwt.verify(userToken, process.env.JWT_SECRET, (err, payLoad) => {
+        await jwt.verify(staffToken, process.env.secretKey, (err, payLoad) => {
 
             if (err) {
                 return res.json(err.message)
             } else {
-                req.user = payLoad
+                req.staff = payLoad
                 next()
             }
         })
@@ -43,27 +43,28 @@ const authentication = async (req, res, next) => {
 
 const authenticate = async (req, res, next) => {
     try {
-        const user = await  staffModel.findById(req.params.userId)
+        const staff = await  staffModel.findById(req.params.id)
 
-        if(!user) {
+        if(!staff) {
             return res.status(404).json({
                 message: 'Authentication Failed: User not found'
             })
         }
-        const userToken = user.token
+        const staffToken = staff.token
 
-        if(!userToken) {
+        if(!staffToken) {
             return res.status(400).json({
                 message: 'Authentication Failed: Please sign in.'
             })
         }
 
-        await jwt.verify(userToken, process.env.JWT_SECRET, (err, payLoad) => {
+        await jwt.verify(staffToken, process.env.secretKey, (err, payLoad) => {
 
             if (err) {
                 return res.json(err.message)
             } else {
-                req.user = payLoad
+                req.staff = payLoad
+                //console.log(req.staff)
                 next()
             }
         })
@@ -77,8 +78,13 @@ const authenticate = async (req, res, next) => {
 
 // Admin authorization
 const checkUser = (req, res, next) => {
-    authentication(req, res, async () => {
-        if(req.user.isAdmin || req.user.isSuperAdmin) {
+    authenticate(req, res, async () => {
+       // console.log(req.staff.isStaff)
+       const { id } = req.params;
+    //    const id = req.staff.userid.userId
+       const user = await staffModel.findById(id)
+       // console.log(req.staff.userid)
+        if(user.isStaff === false) {
             next()
         } else {
             res.status(400).json({
@@ -91,23 +97,23 @@ const checkUser = (req, res, next) => {
 
 
 // Super admin authorization
-const superAuth = (req, res, next) => {
-    authentication(req, res, async () => {
-        if(req.user.isSuperAdmin) {
-            next()
-        } else {
-            res.status(400).json({
-                message: 'You are not authorized to perform this action'
-            })
-        }
-    })
-}
+// const superAuth = (req, res, next) => {
+//     authentication(req, res, async () => {
+//         if(req.user.isSuperAdmin) {
+//             next()
+//         } else {
+//             res.status(400).json({
+//                 message: 'You are not authorized to perform this action'
+//             })
+//         }
+//     })
+// }
 
 
 
 
 module.exports = {
     checkUser,
-    superAuth,
+    //superAuth,
     authenticate
 }

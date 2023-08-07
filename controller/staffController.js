@@ -80,17 +80,19 @@ const createStaffprofile = async (req, res) => {
                 password: hashPass,
                 role,
                 hospitalcode,
+              
                 staffID: ID,                
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
-
+                  // data.isStaff = true
             const createStaff = new staffModel(data)
             // generate token
-            const newToken = jwt.sign({ name, email }, process.env.secretKey, { expiresIn: "1d" })
+            const newToken = jwt.sign({ name:data.name, email: data.email, isStaff:data.isStaff  }, process.env.secretKey, { expiresIn: "1d" })
 
             createStaff.hospitalcode = hospitalcode
 
             createStaff.token = newToken
+
             await createStaff.save()
             // send verification link
             const baseUrl = process.env.BASE_URL
@@ -103,7 +105,7 @@ const createStaffprofile = async (req, res) => {
             await transporter.sendMail( mailOptions );
             //notify the hospitay that a user has use its codes to register
            const notifyhospital = gethospital.email
-           console.log(notifyhospital)
+           
             // const baseUrl2 = process.env.BASE_URL
             const mailOptions2 = {
                 from: process.env.SENDER_EMAIL,
@@ -115,7 +117,7 @@ const createStaffprofile = async (req, res) => {
             res.status(200).json({ message: "Create successful", data: createStaff })
         }
     } catch (error) {
-        console.error(error)
+       
         res.status(500).json({ message: error.message })
     }
 }
@@ -247,6 +249,7 @@ const logIn = async (req, res) => {
 
       // Compare user's password with the saved password.
         const checkPassword = bcryptjs.compareSync(password, checkUser.password)
+        checkUser.isStaff = true
       // Check for password error
         if (!checkPassword) {
             return res.status(404).json({
@@ -295,14 +298,15 @@ const logIn = async (req, res) => {
 // to logout a staff
 const signOut = async(req, res)=>{
     try {
-        const { staffID } = req.body;
-        console.log()
+        const { staffid} = req.params;
+        console.log(staffid)
         token = ' ';
-        console.log(token)
-        const userLogout = await staffModel.findOne(staffID, {token: token}, {islogin: true});
+       // console.log(token)
+        const userLogout = await staffModel.findById(staffid, {token: token}, {islogin: true});
         //const logout = await staffModel.findByIdAndUpdate(staffId, {islogin: false});
         // userLogout.token = ' ';
         // user.islogin = false;
+        userLogout.isStaff = false
         if(!userLogout) {
             res.status(400).json({
                 message: 'User not logged out'

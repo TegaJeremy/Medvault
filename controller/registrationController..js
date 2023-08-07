@@ -113,8 +113,8 @@ const register = async (req, res)=>{
 
       // };
       const baseUrl = process.env.BASE_URL;
-// const link = `http://localhost:5173/verification?token=${token}`;
-const link = `http://www.google.com`
+ const link = `https://medvault-xixt.onrender.com/#/registration?token=${token}`;
+//const link = `http://www.google.com`
 const mailOptions = {
     from: process.env.SENDER_EMAIL,
     to: email,
