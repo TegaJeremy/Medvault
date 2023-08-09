@@ -1,5 +1,6 @@
 const jwt = require ('jsonwebtoken')
 const staffModel = require('../model/staffModel');
+const adminmodel = require('../model/registrationmodel')
 
 
 // To authenticate a user token in the database

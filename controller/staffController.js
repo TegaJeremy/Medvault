@@ -93,16 +93,18 @@ const createStaffprofile = async (req, res) => {
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
                   // data.isStaff = true
+                  gethospital.Staff.push(data._id);
+            await gethospital.save()
             const createStaff = new staffModel(data)
             // generate token
-            const newToken = jwt.sign({ name:data.name, email: data.email, isStaff:data.isStaff  }, process.env.secretKey, { expiresIn: "1d" })
+            const newToken = jwt.sign({ name:data.name, email: data.email, isStaff:data.isStaff}, process.env.secretKey, { expiresIn: "1d" })
 
             createStaff.hospitalcode = hospitalcode
 
             createStaff.token = newToken
 
             await createStaff.save()
-            const link = `https://medvault-xixt.onrender.com/#/verification?token=${newToken}`;
+            const link = `https://medvault-xixt.onrender.com/#/verification/{newToken}`;
             // send verification link
             //const baseUrl = process.env.BASE_URL
              const mailOptions = {

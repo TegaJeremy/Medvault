@@ -1,10 +1,11 @@
 const express = require('express')
 
 const { createpatient, deletePatient, recoverpatient, getallpatient, getonepatient, updatePatient, getAllpatientByHospital, addDiagnosis }= require("../controller/patientcontroller")
+const {userAuth} = require('../middleware/AUTH')
 const router = express.Router()
-const {checkUser}= require('../middleware/authorization')
+//const {checkUser}= require('../middleware/authorization')
 
-router.route("/createpatient/:id").post(checkUser, createpatient)
+router.route("/createpatient").post(userAuth,createpatient)
 router.route("/delete/:patientID").delete(deletePatient)
 router.route("/recover/:patientID").patch(recoverpatient)
 router.route("/getallpatient").get(getallpatient)

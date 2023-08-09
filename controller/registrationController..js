@@ -8,13 +8,31 @@ const nodemailer = require('nodemailer')
 
 
 const transporter = nodemailer.createTransport({
-    service:"Gmail",
-    port: 2525,
+
+   host:"smtp.gmail.com",
+  service:"Gmail",
+    port:587,
+    // port: 2525,
   auth: {
     user: process.env.user,
     pass: process.env.password
-  }
+  },
+  tls:{
+      rejectUnauthorized: false,
+     },
   });
+  // host:"smtp.gmail.com",
+  // service:"Gmail",
+  //   port:587,
+  //   secure:false,
+  // auth: {
+  //   user: process.env.user,
+  //   pass: process.env.password, 
+  // },
+  // tls:{
+  //   rejectUnauthorized: false,
+  // },
+  // });
 
 
 
@@ -97,7 +115,7 @@ const register = async (req, res)=>{
         LGA,
         hospitalcode:ID
     })
-    const token = jwt.sign( { email:user.email, hospitalcode:user.hospitalcode }, process.env.secretKey, { expiresIn: "30m" } );
+    const token = jwt.sign( { email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "30m" } );
     
       // return res.status(400).json({message:"erroe trying to validate user",
       //    error:validate[0].message
@@ -422,6 +440,27 @@ const logout = async (req, res) => {
     });
   }
 };
+const getHospitalWithStaffAndPatients = async (req, res) => {
+  const { hospitalId } = req.params;
+  
+  try {
+      const hospital = await registerModel.findById(hospitalId)
+          .populate('staff')
+          .populate('patients');
+      
+      if (!hospital) {
+          return res.status(404).json({ message: 'Hospital not found.' });
+      }
+
+      return res.status(200).json({
+          message: 'Hospital with staff and patients:',
+          data: hospital
+      });
+
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
 
 
 //updating hospital info  
@@ -539,7 +578,7 @@ try {
       const { email, hospitalcode } = req.body;
      
       //send the link of the staff registration page along sid the hospital code
-      const registrationlink =`http://myplatform.com/register?hospitalcode=${hospitalcode}`
+      const registrationlink =`http://myplatform.com/register/${hospitalcode}`
              
     
       //send the mail
@@ -573,6 +612,7 @@ module.exports = {
     logout,
     updatehospitalinfo,
     deleteAccount,
-    createstaff
+    createstaff,
+    getHospitalWithStaffAndPatients
 
 }

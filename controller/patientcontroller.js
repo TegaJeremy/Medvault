@@ -98,10 +98,12 @@ const createpatient = async (req, res)=>{
             otherContacts,
              diagnosis,
             patientID:ID,
-            hospitalcode,
+            hospitalcode:hospitalcode,
             patientImage: {public_id:patientphoto.public_id,
                 url:patientphoto.url}  
             })
+            gethospital.patients.push(patientProfile._id);
+            await gethospital.save()
           const patientInfo = await patientProfile.save();
              if(patientInfo){
              res.status(201).json({
@@ -125,110 +127,88 @@ const createpatient = async (req, res)=>{
          }
      }
      
-     //getting all patient in the database
-     const getallpatient = async (req, res) => {
-        const AllPatients = await patientModel.find();
-        if (AllPatients) {
-            res.status(200).json({
-                message: "All patients in the database",
-                data: AllPatients
-            })
-        } else {
-            res.status(404).json({
-                message: "Can't find all patients in the database"
-            })
-        }
-    
-    }
+    const getallpatient = async (req, res) => {
+      const allPatients = await patientModel.find();
+      
+      if (allPatients.length === 0) {
+          return res.status(200).json({
+              message: "There are no patients in the database"
+          });
+      }
+  
+      const activePatients = allPatients.filter(patient => !patient.deleted);
+  
+      if (activePatients.length === 0) {
+          return res.status(404).json({
+              message: "All patients in the database have been deleted"
+          });
+      }
+  
+      return res.status(200).json({
+          message: "Active patients in the database",
+          data: activePatients
+      });
+  }
+  
 
     //getting all patient associated to one hospital
-    const getAllpatientByHospital = async (req, res) => {
-        try {
+        const getAllpatientByHospital = async (req, res) => {
+      try {
           const { hospitalcode } = req.params;
-          
-           // Look for the hospital with the specified hospitalcode
-           const hospital = await hospitalModel.findOne({hospitalcode });
-          
-      
-          if (!hospital) {
-            return res.status(404).json({ message: 'Hospital not found' });
-          }
-      
-          // Find all staff members with the same hospitalcode
-          const patient = await patientModel.find({ hospitalcode });
-        
-          if(patient === 0){
-            res.status(404).json({message:"there are no patient registered "})
-    
-          }else(
-            res.status(200).json({ message: 'all patient under this hospital are', data: patient })
-          )
-         
-        } catch (error) {
-          res.status(500).json({ message: error.message });
-        }
-      };
-
-    const getonepatient = async (req, res) => {
-        let {patientID}= req.params
-        const patient = await patientModel.findOne({patientID})
-        if (patient) {
-            res.status(200).json({
-                message:"patient:",
-                data: patient
-            })
-        } else {
-            res.status(404).json({
-                message: "Unable to find patient with ID "+{patient}
-            })
-        }
-        
-    }
-
-    // const updatePatient = async (req, res) => {
-    //     try {
-    //         const {patientID} = req.params;
-    //         const patient = await patientModel.findOne({patientID})
-    //         if(!patient){
-    //             res.status(404).json({message:'error getting staff please chech id'})
-    //         }
-                    
-    //         const {patientName,dateOfBirth,gender,homeAddress,email,PhoneNumber,bloodGroup,fathersName,fathersPhonenumber,mothersName,
-    //             MothersPhonenumber,relationshipStatus,spouseName,spousePhonenumber,otherContacts,} = req.body;
-    
-    //             const updated = {
-    //             patientName:patientName || patient.patientName,
-    //             dateOfBirth:dateOfBirth || patient.dateOfBirth,
-    //             gender:gender|| patient.gender,
-    //             homeAddress:homeAddress || patient.homeAddress,
-    //             emai:email || patient.email,
-    //             PhoneNumber:PhoneNumber || patient.PhoneNumber,
-    //             bloodGroup:bloodGroup || patient.bloodGroup,
-    //             fathersName:fathersName  || patient.fathersName,
-    //             fathersPhonenumber:fathersPhonenumber || patient.fathersPhonenumber,
-    //             mothesName:mothersName || patient.fathersPhonenumber,
-    //             MothersPhonenumber:MothersPhonenumber || patient.MothersPhonenumber,
-    //             relationshipStatus:relationshipStatus || patient.relationshipStatus,
-    //             spouseName:spouseName || patient.spouseName,
-    //             spousePhonenumber:spousePhonenumber|| patient.spousePhonenumber,
-    //             otherContacts:otherContacts || patient.otherContacts
-    //           }
-
-    //    // Perform the update and set { new: true } option to get the updated document
-    //   const updatedStaff = await patientModel.findOneAndUpdate({ patientID }, updated, { new: true });
   
-    //   if (!updatedStaff) {
-    //     return res.status(400).json({ message: 'Failed to Update User' });
-    //   } else {
-    //     return res.status(200).json({ message: 'User updated successfully', data: updatedStaff });
-    //   }
-    //     } catch (error) {
-    //         const err = error.message;
-    //         res.status(500).json({
-    //             message: `error ${err}`
-    //         })
-    //     }
-    // }
+          // Look for the hospital with the specified hospitalcode
+          const hospital = await hospitalModel.findOne({ hospitalcode });
+  
+          if (!hospital) {
+              return res.status(404).json({ message: 'Hospital not found. Please check the hospital code.' });
+          }
+  
+          // Find all staff members with the same hospitalcode
+          const patients = await patientModel.find({ hospitalcode, deleted: false });
+  
+          if (patients.length === 0) {
+              return res.status(404).json({ message: 'No patients registered under this hospital.' });
+          } else {
+              return res.status(200).json({ message: 'All patients under this hospital:', data: patients });
+          }
+  
+      } catch (error) {
+          res.status(500).json({ message: error.message });
+      }
+  };
+  
+  const getonepatient = async (req, res) => {
+    let { patientID } = req.params;
+    
+    try {
+        const patient = await patientModel.findOne({ patientID });
+
+        if (!patient) {
+            return res.status(404).json({
+                message: "Unable to find patient with ID " + patientID
+            });
+        }
+
+        if (patient.deleted) {
+            return res.status(404).json({
+                message: "Patient with ID " + patientID + " has been deleted and is not available."
+            });
+        }
+
+        return res.status(200).json({
+            message: "Patient:",
+            data: patient
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+
+    
  
 const updatePatient = async (req, res) => {
   try {

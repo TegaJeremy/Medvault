@@ -25,7 +25,6 @@ const   patientschema = new mongoose.Schema({
         phoneNumber: {
             type: String,
             required: [true, 'Mobile Phone Number is Required'],
-            unique: true,
             sparse: true,
            
         },
@@ -67,5 +66,5 @@ const   patientschema = new mongoose.Schema({
 },{timestamps:true}
 )
 
-const patientModel = mongoose.model("new patient", patientschema)
+const patientModel = mongoose.model("Patient", patientschema)
 module.exports = patientModel

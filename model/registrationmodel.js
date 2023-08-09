@@ -29,11 +29,9 @@ facilityaddress:{
     type:String,
     required:true["city is required"]
 },
-  staff:[{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'staff',
-    require:true
-}],
+  
+staff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Staff' }],
+    patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
     LGA:{
     type:String,
     required:true["LGA is required"]
