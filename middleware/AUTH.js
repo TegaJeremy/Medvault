@@ -21,10 +21,8 @@ const userAuth = ( req, res, next ) => {
        // req.username = decodedToken.username;
        req.isVerified = decodedToken.isVerified
        if(req.isVerified === false){
-        res.status(401).json({ message: 'user is not  verified, please verify your acc'})
+         return res.status(401).json({ message: 'user is not  verified, please verify your acc'})
        }
-
-
         next();
     } catch (error) {
         res.status(500).json({ message: error.message})

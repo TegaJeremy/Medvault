@@ -8,6 +8,7 @@ const { error } = require('console')
 
 //creating a patient, with the hospital code 
 const createpatient = async (req, res)=>{
+
     try{
         const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,
             relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
@@ -54,6 +55,7 @@ const createpatient = async (req, res)=>{
             if(!hospitalcode || hospitalcode?.trim().length === 0){
               return res.status(404).json({message:" hospitalcode should not be empty"})
             }
+            
              // Check if the email is already taken
     const existingPatient = await patientModel.findOne({ email });
     if (existingPatient) {
@@ -64,10 +66,10 @@ const createpatient = async (req, res)=>{
       }
   
       // Check if the phoneNumber is unique
-      const existingPatient2 = await patientModel.findOne({ phoneNumber });
-      if (existingPatient2) {
-        return res.status(409).json({ message: 'Phone Number already exists' });
-      }
+      // const existingPatient2 = await patientModel.findOne({ phoneNumber });
+      // if (existingPatient2) {
+      //   return res.status(409).json({ message: 'Phone Number already exists' });
+      // }
      // look for the hospital
      const gethospital = await hospitalModel.findOne({hospitalcode})
      if (!gethospital) {
@@ -82,6 +84,7 @@ const createpatient = async (req, res)=>{
             catch (error) {
                 error.message
             }
+
         
         })
         const patientProfile = new patientModel({
@@ -103,7 +106,9 @@ const createpatient = async (req, res)=>{
                 url:patientphoto.url}  
             })
             gethospital.patients.push(patientProfile._id);
-            await gethospital.save()
+            //console.log("Before saved hospital")
+             await gethospital.save()
+            //console.log(savedHospital, "After saved hospital")
           const patientInfo = await patientProfile.save();
              if(patientInfo){
              res.status(201).json({
