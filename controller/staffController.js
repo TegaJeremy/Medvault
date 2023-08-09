@@ -26,8 +26,13 @@ const createStaffprofile = async (req, res) => {
         // get the request body
         const { name, age, email, phoneNumber,password, role, hospitalcode } = req.body
         let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let regexPattern = /^[a-zA-Z ]+$/
+        let phonePattern = /^[+\d]+$/
         if(!name || name?.trim().length === 0){
           return res.status(404).json({message:"name imput cannot be epmyt"})
+        } 
+        if(!regexPattern?.test( name)){
+          return res.status(404).json({message:" name can only contain letters"})
         }  
         if(!age || age?.trim().length === 0){
           return res.status(404).json({message:"age cannot be empty"})
@@ -35,11 +40,14 @@ const createStaffprofile = async (req, res) => {
         if(!email || !emailPattern?.test(email)){
           return res.status(404).json({message:"email not valid"})
         }
-        if(!password || password?.trim().length === 0 || password?.trim().length > 15){
-          return res.status(404).json({message:" password should not be empty or more than 15 characters"})
+        if(!password || password?.trim().length === 0 || password?.trim().length > 10){
+          return res.status(404).json({message:" password should not be empty or more than 10 characters"})
         } 
         if(!phoneNumber || phoneNumber?.trim().length === 0  ){
           return res.status(404).json({message:" phoneNumber pattern not supported"})
+        }
+        if(!phonePattern?.test(phoneNumber) ){
+          return res.status(404).json({message:"phonenumber can only contain numbers"})
         }
         if(!role){
             return res.status(404).json({message:" role cannot be empty"})
@@ -94,14 +102,88 @@ const createStaffprofile = async (req, res) => {
             createStaff.token = newToken
 
             await createStaff.save()
+            const link = `https://medvault-xixt.onrender.com/#/verification?token=${newToken}`;
             // send verification link
-            const baseUrl = process.env.BASE_URL
-            const mailOptions = {
+            //const baseUrl = process.env.BASE_URL
+             const mailOptions = {
                 from: process.env.SENDER_EMAIL,
-                to:email,
-                subject: "Verify your account",
-                html: `Please click on the link to verify your email: <a href="${baseUrl}/users/verify-email/${ newToken }">Verify Email</a>`,
-            };
+                 to:email,
+            //     subject: "Verify your account",
+            //     html: `Please click on the link to verify your email: <a href="${link}/">Verify Email</a>`,
+            // };
+            //<!DOCTYPE html>
+              html: `
+              <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Reset default styles */
+        body, p, h1, h2, h3, h4, h5, h6 {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .content {
+            margin-bottom: 20px;
+            color: #555555;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="color: #ff6600;">Verify Your Account</h1>
+        </div>
+        <div class="content">
+            <p>Thank you for signing up! Please click on the link below to verify your email:</p>
+            <p><a class="button" href="${link}/">Verify Email</a></p>
+        </div>
+    </div>
+</body>
+</html>
+`
+}
+
+
             await transporter.sendMail( mailOptions );
             //notify the hospitay that a user has use its codes to register
            const notifyhospital = gethospital.email
@@ -358,21 +440,29 @@ const updateStaff = async (req, res) => {
   
       const { name, email, role, age } = req.body;
       let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      let regexPattern = /^[a-zA-Z ]+$/
+        let phonePattern = /^[+\d]+$/
       if( name?.trim().length === 0){
         return res.status(404).json({message:"name imput cannot be epmyt"})
       }  
+      if(!regexPattern?.test( name)){
+        return res.status(404).json({message:" name can only contain letters"})
+      } 
       if( age?.trim().length === 0){
         return res.status(404).json({message:"age cannot be empty"})
       } 
       if(emailPattern?.test(email)){
         return res.status(404).json({message:"email not valid"})
       } 
-      if(phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
-        return res.status(404).json({message:" phoneNumber pattern not supported"})
-      }
-      if(hospitalcode?.trim().length === 0){
-        return res.status(404).json({message:" hospitalcode should not be empty"})
-      }
+      // if(phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+      //   return res.status(404).json({message:" phoneNumber pattern not supported"})
+      // }
+      // if(!phonePattern?.test(phoneNumber) ){
+      //   return res.status(404).json({message:"phonenumber can only contain numbers"})
+      // }
+      // if(hospitalcode?.trim().length === 0){
+      //   return res.status(404).json({message:" hospitalcode should not be empty"})
+      // }
   
       // Prepare the fields to be updated
       const updateData = {
@@ -385,11 +475,18 @@ const updateStaff = async (req, res) => {
       };
   
        // Check if a new image was uploaded
-    if (req.files && req.files.photo) {
-        // Delete the old image from Cloudinary if it exists
-        if (staff.public_id) {
-          await cloudinary.uploader.destroy(staff.public_id);
-        }
+    // if (req.files && req.files.photo) {
+    //     // Delete the old image from Cloudinary if it exists
+    //     if (staff.public_id) {
+    //       await cloudinary.uploader.destroy(staff.public_id);
+    //     }
+     // Delete the existing image from local upload folder and Cloudinary
+     if (req.files) {
+      //  console.log(profile[0].photo)
+
+      const publicId = staff.photo.url.split("/").pop().split(".")[0];
+      
+      await cloudinary.uploader.destroy(publicId)
         // // Upload the new image to Cloudinary
         const file = await cloudinary.uploader.upload(req.files.photo.tempFilePath);
         updateData.photo = file.secure_url;

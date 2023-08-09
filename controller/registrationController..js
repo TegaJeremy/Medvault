@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 // const validator = require('../middleware/validation')
-const Validator = require('fastest-validator');
+//const Validator = require('fastest-validator');
 
 
 const transporter = nodemailer.createTransport({
@@ -26,20 +26,28 @@ const register = async (req, res)=>{
 
     //check and validate the impute of the user
        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+       let regexPattern = /^[a-zA-Z ]+$/
+       let phonePattern = /^[+\d]+$/
         if(!facilityname || facilityname?.trim().length === 0){
-          return res.status(404).json({message:"facility name cannot be empty"})
-        }  
+          return res.status(404).json({message:"facility name field cannot be empty"})
+        }
+        if(!regexPattern?.test( facilityname)){
+          return res.status(404).json({message:"facility name can only contain letters"})
+        }        
         if(!facilityaddress || facilityaddress?.trim().length === 0){
           return res.status(404).json({message:"facility address cannot be empty"})
         } 
         if(!email || !emailPattern?.test(email)){
           return res.status(404).json({message:"email pattern not valid"})
         }
-        if(!password || password?.trim().length === 0 || password?.trim().length > 15){
-          return res.status(404).json({message:" password should not be empty or more than 15 characters"})
+        if(!password || password?.trim().length === 0 || password?.trim().length > 10){
+          return res.status(404).json({message:" password should not be empty or more than 10 characters"})
         } 
-        if(!facilityphone || facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+        if(!facilityphone ||facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
           return res.status(404).json({message:" facilityphone phone should not be empty or more than 15 character"})
+        }
+        if(!phonePattern?.test(facilityphone) ){
+          return res.status(404).json({message:" facilityphone phone can only contain numbers"})
         }
         if(!city || city?.trim().length === 0){
           return res.status(404).json({message:" city field should not be empty"})
@@ -50,13 +58,6 @@ const register = async (req, res)=>{
         if(!LGA || LGA?.trim().length === 0){
           return res.status(404).json({message:" LGA should be empty"})
         }
-        //validating the impute the user puts
-    // const validation = validator(email, facilityphone, facilityname);
-    // if (!validation.isValid) {
-    //   return res.status(400).json({
-    //     message: validation.message
-    //   });
-     //}
      // check if the email is been registered has already been registered
      const isEmail = await registerModel.findOne( { email } );
      if ( isEmail ) {
@@ -72,7 +73,7 @@ const register = async (req, res)=>{
     //hash the password using bcrypt
     const hashedPassword  = bcrypt.hashSync(password, salt)
       // create a token
-      const token = jwt.sign( { email }, process.env.secretKey, { expiresIn: "30m" } );
+     
       //creating a function that will generate random id for the hospitals
       
     //   function generateID(){
@@ -96,6 +97,7 @@ const register = async (req, res)=>{
         LGA,
         hospitalcode:ID
     })
+    const token = jwt.sign( { email:user.email, hospitalcode:user.hospitalcode }, process.env.secretKey, { expiresIn: "30m" } );
     
       // return res.status(400).json({message:"erroe trying to validate user",
       //    error:validate[0].message
@@ -112,8 +114,11 @@ const register = async (req, res)=>{
       //    text: `plase click on the link to verify your account${link}`
 
       // };
+      console.log(token)
       const baseUrl = process.env.BASE_URL;
- const link = `https://medvault-xixt.onrender.com/#/verification?token=${token}`;
+ const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
+ //"/verification/:token" (How frontend should write route)
+ console.log(link)
 //const link = `http://www.google.com`
 const mailOptions = {
     from: process.env.SENDER_EMAIL,
@@ -213,11 +218,11 @@ const verifyEmail = async (req, res) => {
         await user.save();
 
         // update the user's verification status
-        const updatedUser = await registerModel.findOneAndUpdate( {email}, user );
+        // const updatedUser = await registerModel.findOneAndUpdate( {email}, user );
 
         res.status( 200 ).json( {
             message: "User verified successfully",
-            data: updatedUser,
+            // data: updatedUser,
         })
         // res.status( 200 ).redirect( `${ process.env.BASE_URL }/login` );
 
@@ -434,9 +439,14 @@ const updatehospitalinfo = async (req, res) => {
     const  {facilityname, facilityaddress, email, facilityphone, state, city , LGA,} = req.body
       //check and validate the impute of the user
       let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      let regexPattern = /^[a-zA-Z ]+$/
+      let phonePattern = /^[+\d]+$/
       if( facilityname?.trim().length === 0){
         return res.status(404).json({message:"facility name cannot be empty"})
-      }  
+      }
+      if(!regexPattern?.test( facilityname)){
+        return res.status(404).json({message:"facility name can only contain letters"})
+      }    
       if(facilityaddress?.trim().length === 0){
         return res.status(404).json({message:"facility address cannot be empty"})
       } 
@@ -445,6 +455,9 @@ const updatehospitalinfo = async (req, res) => {
       }
       if(facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
         return res.status(404).json({message:" facilityphone phone should not be empty or more than 15 character"})
+      }
+      if(!phonePattern?.test(facilityphone) ){
+        return res.status(404).json({message:" facilityphone phone can only contain numbers"})
       }
       if(city?.trim().length === 0){
         return res.status(404).json({message:" city field should not be empty"})

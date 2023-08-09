@@ -12,9 +12,14 @@ const createpatient = async (req, res)=>{
         const {patientName,dateOfBirth,gender,homeAddress,email,phoneNumber,bloodGroup,
             relationshipStatus,spouseName,spousePhonenumber,otherContacts,hospitalcode,diagnosis} = req.body
             let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let regexPattern = /^[a-zA-Z ]+$/
+            let phonePattern = /^[+\d]+$/
             //validate the impute and give necessary response
             if(!patientName || patientName?.trim().length === 0){
               return res.status(404).json({message:"patientname imput cannot be epmyt"})
+            }  
+            if(!regexPattern?.test( patientName)){
+              return res.status(404).json({message:"patient name can only contain letters"})
             }  
             if(!dateOfBirth || dateOfBirth?.trim().length === 0){
               return res.status(404).json({message:" date of birth cannot be empty"})
@@ -42,6 +47,9 @@ const createpatient = async (req, res)=>{
             }
             if(!phoneNumber||phoneNumber?.trim().length >15 ){
               return res.status(404).json({message:" phoneNumber pattern not supported"})
+            }
+            if(!phonePattern?.test(phoneNumber) ){
+              return res.status(404).json({message:"phoneNumber can only contain numbers"})
             }
             if(!hospitalcode || hospitalcode?.trim().length === 0){
               return res.status(404).json({message:" hospitalcode should not be empty"})
@@ -244,22 +252,27 @@ const updatePatient = async (req, res) => {
       spousePhonenumber,
       otherContacts
     } = req.body;
-
+    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let regexPattern = /^[a-zA-Z ]+$/
+    let phonePattern = /^[+\d]+$/
     //validate the impute
-    if(!patientName || natientNameme?.trim().length === 0){
+    if(!patientName || patientName?.trim().length === 0){
       return res.status(404).json({message:"patientname imput cannot be epmyt"})
+    }  
+    if(!regexPattern?.test( patientName)){
+      return res.status(404).json({message:"patient name can only contain letters"})
     }  
     if(!dateOfBirth || dateOfBirth?.trim().length === 0){
       return res.status(404).json({message:" date of birth cannot be empty"})
     } 
     if(!gender || gender?.trim().length === 0){
-      return res.status(404).json({message:"age cannot be empty"})
+      return res.status(404).json({message:"gender cannot be empty"})
     } 
     if(!email || !emailPattern?.test(email)){
       return res.status(404).json({message:"email not valid"})
     }
     if(!homeAddress || homeAddress?.trim().length === 0){
-      return res.status(404).json({message:"age cannot be empty"})
+      return res.status(404).json({message:"home address cannot be empty"})
     } 
     if(!bloodGroup || bloodGroup?.trim().length === 0){
       return res.status(404).json({message:"bloodGroup cannot be empty"})
@@ -275,6 +288,9 @@ const updatePatient = async (req, res) => {
     } 
     if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
       return res.status(404).json({message:" phoneNumber pattern not supported"})
+    }
+    if(!phonePattern?.test(phoneNumber) ){
+      return res.status(404).json({message:"phoneNumber can only contain numbers"})
     }
     if(hospitalcode?.trim().length === 0){
       return res.status(404).json({message:" hospitalcode should not be empty"})
@@ -300,13 +316,12 @@ const updatePatient = async (req, res) => {
       otherContacts: otherContacts || patient.otherContacts
     };
 
-    // Check if a new image was uploaded
-    if (req.files && req.files.patientImage) {
-      console.log(profile[0].patientphoto)
-      // Delete the old image from Cloudinary if it exists
-      if (patient.public_id) {
-        await cloudinary.uploader.destroy(patient.public_id);
-      }
+    if (req.files) {
+      //  console.log(profile[0].photo)
+
+      const publicId = patient.patientImage.url.split("/").pop().split(".")[0];
+      
+      await cloudinary.uploader.destroy(publicId)
       // // Upload the new image to Cloudinary
       const file = await cloudinary.uploader.upload(req.files.patientImage.tempFilePath);
       updated.patientImage = file.secure_url;
