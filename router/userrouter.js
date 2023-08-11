@@ -11,8 +11,6 @@ router.route("/registration").post(register)
 router.route("/verifyemail/:token").post(verifyEmail)
 router.route("/resendverificationemail").post(resendVerificationEmail)
 
-
-
 // Your logout route
 
 

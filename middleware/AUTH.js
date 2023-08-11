@@ -1,5 +1,6 @@
 const jwt = require( 'jsonwebtoken' );
 const userModel = require('../model/registrationmodel')
+const staffModel = require('../model/staffModel')
 
 // auth middleware
 const userAuth = ( req, res, next ) => {
@@ -84,8 +85,44 @@ const userAuth = ( req, res, next ) => {
 //     })
 // };
 
+const findUserAndCheckLogin = async (req, res) => {
+    try {
+        const { userId } = req.params;
+       // const { staffId } = req.params;
+
+        // Find the user by their ID
+        const user = await userModel.findById(userId);
+        //const staff = await staffModel.findById(staffId)
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found',
+            });
+        }
+
+        // Check if the user is logged in
+        if (user.islogin) {
+            return res.status(200).json({
+                message: 'User is logged in',
+                
+            });
+        } else {
+            return res.status(200).json({
+                message: 'User is not logged in, please login',
+               
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            Error: error.message,
+        });
+    }
+};
+
+
 module.exports = {
     userAuth,
+    findUserAndCheckLogin
    // loginAuth
 };
 

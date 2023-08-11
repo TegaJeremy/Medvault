@@ -26,9 +26,9 @@ const staffSchema = new mongoose.Schema({
             public_id: { type: String},
              url:{ type: String, }
     },
-    token: {
-        type: String,
-    },
+    // token: {
+    //     type: String,
+    // },
     isVerified: {
         type: Boolean,
         default: false
@@ -43,7 +43,7 @@ const staffSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    isLogin: {
+    islogin: {
         type: Boolean,
         default: false
     }

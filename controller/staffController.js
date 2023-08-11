@@ -99,11 +99,11 @@ const createStaffprofile = async (req, res) => {
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
                   // data.isStaff = true
-                  gethospital.Staff.push(data._id);
+                  gethospital.staff.push(data._id);
             await gethospital.save()
             const createStaff = new staffModel(data)
             // generate token
-            const newToken = jwt.sign({ name:data.name, email: data.email, isStaff:data.isStaff}, process.env.secretKey, { expiresIn: "1d" })
+            const newToken = jwt.sign({email:data.email , islogin: data.islogin}, process.env.secretKey, { expiresIn: "1d" })
 
             createStaff.hospitalcode = hospitalcode
 
@@ -204,7 +204,9 @@ const createStaffprofile = async (req, res) => {
                 text: `hospital with this mail ${email} registereg with your hospital code `,
             };
             await transporter.sendMail( mailOptions2 );
-            res.status(200).json({ message: "Create successful", data: createStaff })
+            res.status(200).json({ message: "Create successful",
+             data: createStaff ,
+             newToken})
         }
     } catch (error) {
        
@@ -356,6 +358,10 @@ const logIn = async (req, res) => {
           }
 
         const token = jwt.sign({
+          name: checkUser.name, 
+          email: checkUser.email, 
+          isStaff:checkUser.isStaff,
+          isLogin: checkUser.islogin,
           userId: checkUser._id,
             password: checkUser.password,
             // isAdmin: checkUser.isAdmin,
