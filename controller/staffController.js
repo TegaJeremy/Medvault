@@ -10,13 +10,19 @@ const validator =require('../middleware/validation')
 
 
 const transporter = nodemailer.createTransport({
-    service:"Gmail",
-    port: 2525,
-  auth: {
-    user: process.env.user,
-    pass: process.env.password
-  }
-  });
+
+  host:"smtp.gmail.com",
+ service:"Gmail",
+   port:587,
+   // port: 2525,
+ auth: {
+   user: process.env.user,
+   pass: process.env.password
+ },
+ tls:{
+     rejectUnauthorized: false,
+    },
+ });
 
   //this function allows the the staff to register under a hospital
   //its under, alongside the hospital code
@@ -386,7 +392,7 @@ const signOut = async(req, res)=>{
         console.log(staffid)
         token = ' ';
        // console.log(token)
-        const userLogout = await staffModel.findById(staffid, {token: token}, {islogin: true});
+        const userLogout = await staffModel.findById(staffid, {token: token}, {islogin:true});
         //const logout = await staffModel.findByIdAndUpdate(staffId, {islogin: false});
         // userLogout.token = ' ';
         // user.islogin = false;

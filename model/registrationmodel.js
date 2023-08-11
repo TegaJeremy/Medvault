@@ -17,6 +17,10 @@ facilityaddress:{
     type:String,
     required:true["password is required"],
 },
+hospitalLogo: {
+    public_id: { type: String},
+     url:{ type: String, }
+},
       facilityphone:{
     type:String,
     required:true["username is required"]
@@ -36,16 +40,20 @@ staff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Staff' }],
     type:String,
     required:true["LGA is required"]
 },
-        token:{
-    type: String
+    //     token:{
+    // type: String
 
-},
+//},
  hospitalcode:{
    type:String,
     unique: true
    
 },
 isVerified:{
+    type:Boolean,
+    default:false
+},
+islogin:{
     type:Boolean,
     default:false
 },
@@ -66,5 +74,5 @@ isSuperAdmin:{
 },{timestamps:true}
 )
 
-const registerModel = mongoose.model("HOSPITAl9", registerschema)
+const registerModel = mongoose.model("hospital", registerschema)
 module.exports = registerModel

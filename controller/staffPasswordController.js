@@ -1,4 +1,4 @@
-const passwordModel = require('../model/registrationmodel')
+const passwordModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
@@ -9,13 +9,19 @@ const nodemailer = require('nodemailer')
 
 //creating a transporter for sending mail
 const transporter = nodemailer.createTransport({
-  service:"Gmail",
-  port: 2525,
-auth: {
-  user: process.env.user,
-  pass: process.env.password
-}
-});
+
+    host:"smtp.gmail.com",
+   service:"Gmail",
+     port:587,
+     // port: 2525,
+   auth: {
+     user: process.env.user,
+     pass: process.env.password
+   },
+   tls:{
+       rejectUnauthorized: false,
+      },
+   });
 
 // Forgot Password
 const forgotPassword = async (req, res) => {
@@ -92,7 +98,6 @@ const resetPassword = async (req, res) => {
       });
     }
   }
-  
 
   // Change Password
 const changePassword = async (req, res) => {

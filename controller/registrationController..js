@@ -3,6 +3,7 @@ const staffModel = require('../model/staffModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const cloudinary = require('../middleware/cloudinary')
 // const validator = require('../middleware/validation')
 //const Validator = require('fastest-validator');
 
@@ -85,6 +86,12 @@ const register = async (req, res)=>{
     
     
         }else{
+          const hospitalphoto = await cloudinary.uploader.upload(req.files.hospitalLogo.tempFilePath, (error, hospitalLogo) => {
+            try{return hospitalLogo}
+            catch (error) {
+                error.message
+            }
+          })
 
     //salt the password using bcrypt
     const salt = bcrypt.genSaltSync(10)
@@ -102,6 +109,7 @@ const register = async (req, res)=>{
     //     return ID
     //   }
     let ID = Math.floor(Math.random()* 10000)
+
       
       //creating a new data
     const user =  new registerModel( {
@@ -113,9 +121,10 @@ const register = async (req, res)=>{
         state,
         city,
         LGA,
-        hospitalcode:ID
+        hospitalcode:ID,
+        hospitalLogo:{ public_id: hospitalphoto.public_id, url: hospitalphoto.url }
     })
-    const token = jwt.sign( { email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "30m" } );
+    const token = jwt.sign( { email:user.email,islogin: user.islogin }, process.env.secretKey, { expiresIn: "15m" } );
     
       // return res.status(400).json({message:"erroe trying to validate user",
       //    error:validate[0].message
@@ -136,7 +145,7 @@ const register = async (req, res)=>{
       const baseUrl = process.env.BASE_URL;
  const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
  //"/verification/:token" (How frontend should write route)
- console.log(link)
+ 
 //const link = `http://www.google.com`
 const mailOptions = {
     from: process.env.SENDER_EMAIL,
@@ -267,7 +276,7 @@ const resendVerificationEmail = async (req, res) => {
         }
 
         // create a token
-            const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "10m" } );
+            const token = await jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
             
              // send verification email
             const baseUrl = process.env.BASE_URL
@@ -315,6 +324,7 @@ const resendVerificationEmail = async (req, res) => {
 
       // Compare user's password with the saved password.
         const checkPassword = bcrypt.compareSync(password, checkUser.password)
+        checkUser.islogin = true
       // Check for password error
         if (!checkPassword) {
             return res.status(404).json({
@@ -331,6 +341,10 @@ const resendVerificationEmail = async (req, res) => {
           }
 
         const token = jwt.sign({
+           email:checkUser.email, 
+           hospitalcode:checkUser.hospitalcode, 
+           isVerified:checkUser.isVerified,
+           isLogin: checkUser.islogin,
           userId: checkUser._id,
             password: checkUser.password,
             // isAdmin: checkUser.isAdmin,
@@ -346,6 +360,7 @@ const resendVerificationEmail = async (req, res) => {
         res.status(200).json({
             message: 'Login successful',
             data: {
+
                 id: checkUser._id,  
                 token: checkUser.token
 
@@ -413,33 +428,85 @@ const resendVerificationEmail = async (req, res) => {
   // }
 //};
 
+// const logout = async (req, res) => {
+//   try {
+//     // Assuming req.user contains the authenticated user's information
+//     const { hospitalcode } = req.params.hospitalcode;
+//     console.log(req.user)
+//     // Update the user's token to null in the database
+//     const updatedUser = await registerModel.findByIdAndUpdate(
+//       hospitalcode,
+//       { token: null },
+//       { new: true }
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(404).json({
+//         message: 'User not found',
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: 'User logged out successfully',
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       Error: error.message,
+//     });
+//   }
+// };
+// Sign Out
+// const logout = async (req, res)=>{
+//   try {
+//       const { hospitalId } = req.params;
+//       const blacklist = [];
+//       const hasAuthorization = req.headers.authorization;
+//       const token = hasAuthorization.split(" ")[1];
+//       blacklist.push(token);
+//       const logout = await registerModel.findByIdAndUpdate(hospitalId, {islogin: false}); 
+//       res.status(200).json({
+//           message: 'Logged out successfully'
+//       })
+//       console.log()
+//   } catch (error) {
+//       res.status(500).json({
+//           message: error.message
+//       })
+//   }
+// };
+
+
 const logout = async (req, res) => {
   try {
-    // Assuming req.user contains the authenticated user's information
-    const { hospitalcode } = req.params.hospitalcode;
-    console.log(req.user)
-    // Update the user's token to null in the database
-    const updatedUser = await registerModel.findByIdAndUpdate(
-      hospitalcode,
-      { token: null },
-      { new: true }
-    );
+    const { hospitalId } = req.params;
+    const hasAuthorization = req.headers.authorization;
 
-    if (!updatedUser) {
-      return res.status(404).json({
-        message: 'User not found',
+    if (!hasAuthorization) {
+      return res.status(401).json({
+        message: 'Unauthorized'
       });
     }
 
+    const token = hasAuthorization.split(' ')[1];
+    const decodedToken = jwt.decode(token, { complete: true }); // Decode the token
+
+    // Invalidate the token by adding it to a blacklist (you might want to store this list in a database)
+    const blacklistedTokens = []; // Store blacklisted tokens
+    blacklistedTokens.push(token);
+
+    // Update the login status for the hospital
+    const updatedHospital = await registerModel.findByIdAndUpdate(hospitalId, { islogin: false });
+
     res.status(200).json({
-      message: 'User logged out successfully',
+      message: 'Logged out successfully'
     });
   } catch (error) {
     res.status(500).json({
-      Error: error.message,
+      message: error.message
     });
   }
 };
+
 const getHospitalWithStaffAndPatients = async (req, res) => {
   const { hospitalId } = req.params;
   
@@ -526,6 +593,17 @@ const updatehospitalinfo = async (req, res) => {
       city: city || hospital.city,
       LGA: LGA || hospital.LGA,
     };
+
+    if (req.files) {
+      //  console.log(profile[0].photo)
+
+      const publicId = hospital.hospitalLogo.url.split("/").pop().split(".")[0];
+    await cloudinary.uploader.destroy(publicId)
+    // // Upload the new image to Cloudinary
+    const file = await cloudinary.uploader.upload(req.files.hospitalLogo.tempFilePath);
+    updateData.hospitalLogo = file.secure_url;
+    updateData.public_id = file.public_id;
+  }
        // Perform the update and set { new: true } option to get the updated document
     const updatedhospital = await registerModel.findOneAndUpdate({ hospitalcode }, updateData, { new: true });
 
