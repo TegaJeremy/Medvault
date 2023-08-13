@@ -212,7 +212,7 @@ const mailOptions = {
 
             // return a response
             res.status( 201 ).json( {
-            message: `Check your email: ${savedUser.email} to verify your account.`,
+            message: `hospital registered succssfully, please Check your email: ${savedUser.email} to verify your account.`,
             data: savedUser,
             token })
     }
@@ -539,7 +539,7 @@ const updatehospitalinfo = async (req, res) => {
     const hospital = await registerModel.findOne({ hospitalcode });
     //check for errors if the hospital is not registered
     if (!hospital) {
-      return res.status(404).json({ message: 'hospital not foung, please check the hospital code passed' });
+      return res.status(404).json({ message: 'hospital not found, please check the hospital code passed' });
     }
 
     const  {facilityname, facilityaddress, email, facilityphone, state, city , LGA,} = req.body
@@ -654,6 +654,13 @@ try {
       // console.log("Request Body:", req.body); // Log the entire req.body to check the data received
 
       const { email, hospitalcode } = req.body;
+      let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if(emailPattern?.test(email)){
+        return res.status(404).json({message:"email pattern not valid"})
+      }
+      if(!hospitalcode || hospitalcode?.trim().length === 0){
+        return res.status(404).json({message:" hospitalcode  field should not be empty"})
+      }
      
       //send the link of the staff registration page along sid the hospital code
       const registrationlink =`http://myplatform.com/register/${hospitalcode}`

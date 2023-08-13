@@ -26,19 +26,25 @@ const createpatient = async (req, res)=>{
               return res.status(404).json({message:" date of birth cannot be empty"})
             } 
             if(!gender || gender?.trim().length === 0){
-              return res.status(404).json({message:"age cannot be empty"})
+              return res.status(404).json({message:"gender cannot be empty"})
             } 
             if(!email || !emailPattern?.test(email)){
               return res.status(404).json({message:"email not valid"})
             }
             if(!homeAddress || homeAddress?.trim().length === 0){
-              return res.status(404).json({message:"age cannot be empty"})
+              return res.status(404).json({message:"home address cannot be empty"})
             } 
             if(!bloodGroup || bloodGroup?.trim().length === 0){
               return res.status(404).json({message:"bloodGroup cannot be empty"})
             } 
             if(!relationshipStatus){
               return res.status(404).json({message:"relationshipStatus cannot be empty"})
+            } 
+            if(!spouseName){
+              return res.status(404).json({message:"spouseName cannot be empty"})
+            } 
+             if(!spousePhonenumber){
+              return res.status(404).json({message:"spousePhonenumber cannot be empty"})
             } 
             if(!otherContacts){
               return res.status(404).json({message:"otherContacts cannot be empty"})
@@ -132,6 +138,8 @@ const createpatient = async (req, res)=>{
          }
      }
      
+
+     //getting the overall patint of all hospitals combine in th database
     const getallpatient = async (req, res) => {
       const allPatients = await patientModel.find();
       
@@ -183,7 +191,10 @@ const createpatient = async (req, res)=>{
   };
   
   const getonepatient = async (req, res) => {
-    let { patientID } = req.params;
+    let { patientID } = req.body;
+    if(!patientID || patientID?.trim().length === 0){
+      return res.status(404).json({message:"patientID cannot be empty"})
+    }
     
     try {
         const patient = await patientModel.findOne({ patientID });
