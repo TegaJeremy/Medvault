@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
 const createStaffprofile = async (req, res) => {
     try {
         // get the request body
-        const { name, age, email, phoneNumber,password, role, hospitalcode } = req.body
+        const { name, age, email, phoneNumber,password,confirmPassword, role, hospitalcode } = req.body
         let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         let regexPattern = /^[a-zA-Z ]+$/
         let phonePattern = /^[+\d]+$/
@@ -92,12 +92,16 @@ const createStaffprofile = async (req, res) => {
                 email,
                 phoneNumber,
                 password: hashPass,
+                confirmPassword,
                 role,
                 hospitalcode,
               
                 staffID: ID,                
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
             }
+            if (password !==confirmPassword ){
+              return res.status(404).json({message:"password does not match"})
+             }
                   // data.isStaff = true
                   gethospital.staff.push(data._id);
             await gethospital.save()
@@ -292,6 +296,7 @@ const resendVerificationEmail = async (req, res) => {
             } );
         }
 
+        
         // create a token
             const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "10m" } );
             
@@ -363,8 +368,7 @@ const logIn = async (req, res) => {
           isStaff:checkUser.isStaff,
           isLogin: checkUser.islogin,
           userId: checkUser._id,
-            password: checkUser.password,
-            // isAdmin: checkUser.isAdmin,
+            isAdmin: checkUser.isAdmin,
             // isSuperAdmin: checkUser.isSuperAdmin
 
         },

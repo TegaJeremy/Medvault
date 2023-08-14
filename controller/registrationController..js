@@ -41,7 +41,7 @@ const transporter = nodemailer.createTransport({
 const register = async (req, res)=>{
    try {
     //getting the details fromthe request body
-    const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA,} = req.body
+    const  {facilityname, facilityaddress, email, password, facilityphone, state, city , LGA, confirmPassword} = req.body
 
     //check and validate the impute of the user
        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -117,6 +117,7 @@ const register = async (req, res)=>{
         facilityaddress,
         email,
         password:hashedPassword,
+        confirmPassword,
         facilityphone,
         state,
         city,
@@ -124,6 +125,9 @@ const register = async (req, res)=>{
         hospitalcode:ID,
         hospitalLogo:{ public_id: hospitalphoto.public_id, url: hospitalphoto.url }
     })
+     if (password !==confirmPassword ){
+      return res.status(404).json({message:"password does not match"})
+     }
     const token = jwt.sign( { email:user.email,islogin: user.islogin }, process.env.secretKey, { expiresIn: "15m" } );
     
       // return res.status(400).json({message:"erroe trying to validate user",
@@ -141,8 +145,7 @@ const register = async (req, res)=>{
       //    text: `plase click on the link to verify your account${link}`
 
       // };
-      console.log(token)
-      const baseUrl = process.env.BASE_URL;
+            const baseUrl = process.env.BASE_URL;
  const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
  //"/verification/:token" (How frontend should write route)
  
@@ -346,8 +349,7 @@ const resendVerificationEmail = async (req, res) => {
            isVerified:checkUser.isVerified,
            isLogin: checkUser.islogin,
           userId: checkUser._id,
-            password: checkUser.password,
-            // isAdmin: checkUser.isAdmin,
+                       // isAdmin: checkUser.isAdmin,
             // isSuperAdmin: checkUser.isSuperAdmin
 
         },
