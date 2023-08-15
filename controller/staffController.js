@@ -295,8 +295,9 @@ const resendVerificationEmail = async (req, res) => {
                 error: "User not found"
             } );
         }
-
         
+
+
         // create a token
             const token = await jwt.sign( { email }, process.env.secretKey, { expiresIn: "10m" } );
             

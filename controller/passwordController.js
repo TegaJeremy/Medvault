@@ -32,13 +32,14 @@ const forgotPassword = async (req, res) => {
   
       // Generate a reset token
       const resetToken = await jwt.sign({ userId: user._id }, process.env.secretKey, { expiresIn: "15m" });
+      const link =`https://medvault-xixt.onrender.com/#/newPassword/${resetToken}`
   
       // Send reset password email
       const mailOptions = {
         from: process.env.SENDER_EMAIL,
         to: user.email,
         subject: "Password Reset",
-        html: `Please click on the link to reset your password: <a href="${req.protocol}://${req.get("host")}/api/users/reset-password/${resetToken}">Reset Password</a> link expires in 15 minutes`, 
+        html: `Please click on the link  to reset your password:${link} link expires in 15 minutes`, 
       };
   
       await transporter.sendMail(mailOptions);

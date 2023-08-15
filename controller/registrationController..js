@@ -193,10 +193,12 @@ const mailOptions = {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Verify Your Account</h1>
+                <h1>hello ${user.facilityname}</h1>
+                    <h1>welcome to medvault</h1>
+                    
                 </div>
                 <div class="content">
-                    <p>Please click on the link below to verify your account:</p>
+                    <p>Please kindly click on the link below to verify your account:</p>
                     <a class="button" href="${link}">Verify Email</a>
                 </div>
             </div>
@@ -277,17 +279,21 @@ const resendVerificationEmail = async (req, res) => {
                 error: "User not found"
             } );
         }
+        if(user.isVerified === true){
+          return res.status(200).json({message:"user already verified"})
+        }
 
         // create a token
             const token = await jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
             
              // send verification email
             const baseUrl = process.env.BASE_URL
+            const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
             const mailOptions = {
                 from: process.env.SENDER_EMAIL,
                 to: user.email,
                 subject: "Email Verification",
-                html: `Please click on the link to verify your email: <a href="http://localhost:7000/api/users/verify-email/${ token }">Verify Email</a>`,
+                html: `welcome to medvault, please kindly click on this link${link} to verify your account`,
             };
 
             await transporter.sendMail( mailOptions );
@@ -353,7 +359,7 @@ const resendVerificationEmail = async (req, res) => {
             // isSuperAdmin: checkUser.isSuperAdmin
 
         },
-            process.env.secretKey, { expiresIn: "50 mins" })
+            process.env.secretKey, { expiresIn: "1d" })
 
         checkUser.token = token
 
