@@ -31,8 +31,9 @@ const forgotPassword = async (req, res) => {
       }
   
       // Generate a reset token
-      const resetToken = await jwt.sign({ userId: user._id }, process.env.secretKey, { expiresIn: "15m" });
-      const link =`https://medvault-xixt.onrender.com/#/newPassword/${resetToken}`
+      const token =  jwt.sign({ userId: user._id }, process.env.secretKey, { expiresIn: "15m" });
+      const link =`https://medvault-xixt.onrender.com/#/newPassword/${token}`
+      //const link=`https://medvault-xixt.onrender.com/#/verification/${token}`;
   
       // Send reset password email
       const mailOptions = {
