@@ -55,9 +55,9 @@ const createStaffprofile = async (req, res) => {
         if(!phonePattern?.test(phoneNumber) ){
           return res.status(404).json({message:"phonenumber can only contain numbers"})
         }
-        if(!role){
-            return res.status(404).json({message:" role cannot be empty"})
-          }
+        // if(!role ){
+        //     return res.status(404).json({message:" role cannot be empty"})
+        //   }
         if(!hospitalcode || hospitalcode?.trim().length === 0){
           return res.status(404).json({message:" hospitalcode should not be empty"})
         }
@@ -348,6 +348,7 @@ const logIn = async (req, res) => {
       // Compare user's password with the saved password.
         const checkPassword = bcryptjs.compareSync(password, checkUser.password)
         checkUser.isStaff = true
+        checkUser.islogin = true
       // Check for password error
         if (!checkPassword) {
             return res.status(404).json({
@@ -373,6 +374,7 @@ const logIn = async (req, res) => {
             // isSuperAdmin: checkUser.isSuperAdmin
 
         },
+        
             process.env.secretKey, { expiresIn: "1d" })
 
         checkUser.token = token
@@ -397,33 +399,33 @@ const logIn = async (req, res) => {
 }
 
 // to logout a staff
-const signOut = async(req, res)=>{
-    try {
-        const { staffid} = req.params;
-        console.log(staffid)
-        token = ' ';
-       // console.log(token)
-        const userLogout = await staffModel.findById(staffid, {token: token}, {islogin:true});
-        //const logout = await staffModel.findByIdAndUpdate(staffId, {islogin: false});
-        // userLogout.token = ' ';
-        // user.islogin = false;
-        userLogout.isStaff = false
-        if(!userLogout) {
-            res.status(400).json({
-                message: 'User not logged out'
-            })
-        } else {
-            res.status(200).json({
-                message: 'User Successfully logged out',
-                data: userLogout
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
-    }
-}
+const signOut = async (req, res) => {
+  try {
+      // Assuming req.user contains the user ID and token information
+      const { staffId} = req.params;
+
+      // Update the user's islogin property to false and token to null in the database
+      const updatedUser = await staffModel.findByIdAndUpdate(
+        staffId,
+          { islogin: false, token: null },
+          { new: true }
+      );
+
+      if (!updatedUser) {
+          return res.status(404).json({
+              message: 'User not found',
+          });
+      }
+
+      res.status(200).json({
+          message: 'User logged out successfully',
+      });
+  } catch (error) {
+      res.status(500).json({
+          Error: error.message,
+      });
+  }
+};
 
 // get all staff
  const allRegStaff = async (req, res)=>{

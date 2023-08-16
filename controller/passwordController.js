@@ -33,15 +33,79 @@ const forgotPassword = async (req, res) => {
       // Generate a reset token
       const token =  jwt.sign({ userId: user._id }, process.env.secretKey, { expiresIn: "15m" });
       const link =`https://medvault-xixt.onrender.com/#/newPassword/${token}`
-      //const link=`https://medvault-xixt.onrender.com/#/verification/${token}`;
-  
+        
       // Send reset password email
+      // const mailOptions = {
+      //   from: process.env.SENDER_EMAIL,
+      //   to: user.email,
+      //   subject: "Password Reset",
+      //   html: `Please click on the link  to reset your password:${link} link expires in 15 minutes`, 
+      // };
       const mailOptions = {
         from: process.env.SENDER_EMAIL,
         to: user.email,
         subject: "Password Reset",
-        html: `Please click on the link  to reset your password:${link} link expires in 15 minutes`, 
-      };
+        html: `
+            <html>
+            <head>
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #000;
+                        color: #E0F7F6;
+                        font-family: Arial, sans-serif;
+                    }
+                    .container {
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background-color: #001F3F;
+                        border-radius: 10px;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .link {
+                        color: #E0F7F6;
+                        text-decoration: none;
+                        border-bottom: 1px solid #E0F7F6;
+                        transition: border-bottom 0.3s ease;
+                    }
+                    .link:hover {
+                        border-bottom: 2px solid #E0F7F6;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        text-align: center;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Password Reset</h1>
+                    </div>
+                    <p>Please click on the link below to reset your password:</p>
+                    <p><a class="link" href="${link}">Reset Password</a></p>
+                    <p>This link expires in 15 minutes.</p>
+                    <div class="footer">
+                        <p>If you didn't request a password reset, you can ignore this email.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `,
+    };
+    
+    // Use nodemailer to send the email...
+    
+   
+    
+    // Use nodemailer to send the email...
+    
   
       await transporter.sendMail(mailOptions);
   

@@ -482,38 +482,68 @@ const resendVerificationEmail = async (req, res) => {
 //       })
 //   }
 // };
-
-
 const logout = async (req, res) => {
   try {
-    const { hospitalId } = req.params;
-    const hasAuthorization = req.headers.authorization;
+      // Assuming req.user contains the user ID and token information
+      const { hospitalId} = req.params;
 
-    if (!hasAuthorization) {
-      return res.status(401).json({
-        message: 'Unauthorized'
+      // Update the user's islogin property to false and token to null in the database
+      const updatedUser = await registerModel.findByIdAndUpdate(
+        hospitalId,
+          { islogin: false, token: null },
+          { new: true }
+      );
+
+      if (!updatedUser) {
+          return res.status(404).json({
+              message: 'User not found',
+          });
+      }
+
+      res.status(200).json({
+          message: 'User logged out successfully',
       });
-    }
-
-    const token = hasAuthorization.split(' ')[1];
-    const decodedToken = jwt.decode(token, { complete: true }); // Decode the token
-
-    // Invalidate the token by adding it to a blacklist (you might want to store this list in a database)
-    const blacklistedTokens = []; // Store blacklisted tokens
-    blacklistedTokens.push(token);
-
-    // Update the login status for the hospital
-    const updatedHospital = await registerModel.findByIdAndUpdate(hospitalId, { islogin: false });
-
-    res.status(200).json({
-      message: 'Logged out successfully'
-    });
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    });
+      res.status(500).json({
+          Error: error.message,
+      });
   }
 };
+
+module.exports = logout;
+
+
+
+// const logout = async (req, res) => {
+//   try {
+//     const { hospitalId } = req.params;
+//     const hasAuthorization = req.headers.authorization;
+
+//     if (!hasAuthorization) {
+//       return res.status(401).json({
+//         message: 'Unauthorized'
+//       });
+//     }
+
+//     const token = hasAuthorization.split(' ')[1];
+//     const decodedToken = jwt.decode(token, { complete: true }); // Decode the token
+
+//     // Invalidate the token by adding it to a blacklist (you might want to store this list in a database)
+//     const blacklistedTokens = []; // Store blacklisted tokens
+//     blacklistedTokens.push(token);
+
+//     // Update the login status for the hospital
+//     const updatedHospital = await registerModel.findByIdAndUpdate(hospitalId, { islogin: false });
+
+//     res.status(200).json({
+//       message: 'Logged out successfully'
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message
+//     });
+//   }
+// };
 
 const getHospitalWithStaffAndPatients = async (req, res) => {
   const { hospitalId } = req.params;

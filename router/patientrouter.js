@@ -1,18 +1,18 @@
 const express = require('express')
 
 const { createpatient, deletePatient, recoverpatient, getallpatient, getonepatient, updatePatient, getAllpatientByHospital, addDiagnosis }= require("../controller/patientcontroller")
-const {userAuth, findUserAndCheckLogin} = require('../middleware/AUTH')
+const {userAuth, findUserAndCheckLogin, authenticateUser} = require('../middleware/AUTH')
 const router = express.Router()
 //const {checkUser}= require('../middleware/authorization')
 
-router.route("/createpatient/").post(createpatient)
-router.route("/delete/:patientID").delete(userAuth, deletePatient)
-router.route("/recover/:patientID").patch(recoverpatient)
-router.route("/getallpatient").get(getallpatient)
-router.route("/getonepatient/:patientID").get(getonepatient)
-router.route("/updatepatient/:patientID").patch(updatePatient)
-router.route("/hospitals/patient/:hospitalcode").get(getAllpatientByHospital)
-router.route("/addDiagnosis/").post(addDiagnosis)
+router.route("/createpatient/").post(authenticateUser, createpatient)
+router.route("/delete/:patientID").delete( authenticateUser, deletePatient)
+router.route("/recover/:patientID").patch(authenticateUser,recoverpatient)
+router.route("/getallpatient").get(authenticateUser,getallpatient)
+router.route("/getonepatient/:patientID").get(authenticateUser, getonepatient)
+router.route("/updatepatient/:patientID").patchauthenticateUser,(updatePatient)
+router.route("/hospitals/patient/:hospitalcode").getauthenticateUser,(getAllpatientByHospital)
+router.route("/addDiagnosis/").post(authenticateUser,addDiagnosis)
 
 //geting authomatic count
 // const { getTotalDataCount }= require("../middleware/middleware")

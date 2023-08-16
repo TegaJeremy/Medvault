@@ -1,5 +1,5 @@
 const jwt = require( 'jsonwebtoken' );
-const userModel = require('../model/registrationmodel')
+const registerModel = require('../model/registrationmodel')
 const staffModel = require('../model/staffModel')
 
 // auth middleware
@@ -120,9 +120,73 @@ const findUserAndCheckLogin = async (req, res) => {
 };
 
 
+// const authenticateUser = async (req, res, next) => {
+//     try {
+//         const token = req.header('Authorization').replace('Bearer ', '');
+//         if (!token) {
+//             return res.status(401).json({ message: 'Authorization token is missing' });
+//         }
+
+//         const decodedToken = jwt.verify(token, process.env.secretKey);
+//         const adminuser = await registerModel.findOne({ email: decodedToken.email });
+//         const staffuser = await staffModel.findOne({email: decodedToken.email  })
+
+//         if (!adminuser || staffuser) {
+//             return res.status(401).json({ message: 'User not found' });
+//         }
+//          // Check if the user has logged in
+//          if (!adminuser.islogin || !staffuser.islogin) {
+//             return res.status(401).json({ message: 'User has not logged in yet. Please log in.' });
+//         }
+
+//         // Attach user information to the request object
+//         req.adminuser = adminuser;
+//         req.staffuser = staffuser
+
+//         // Continue with the next middleware or route handler
+//         next();
+//     } catch (error) {
+//         res.status(401).json({ message: 'Invalid token' });
+//     }
+// };
+
+const authenticateUser = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ message: 'Authorization token is missing' });
+        }
+
+        const decodedToken = jwt.verify(token, process.env.secretKey);
+        
+        const adminuser = await registerModel.findOne({ email: decodedToken.email, islogin: true });
+        const staffuser = await staffModel.findOne({ email: decodedToken.email, islogin: true });
+
+        if (!adminuser && !staffuser) {
+            return res.status(401).json({ message: 'user has been loged out, please login to continue performing acion.' });
+        }
+
+        // Attach user information to the request object
+        req.adminuser = adminuser;
+        req.staffuser = staffuser;
+
+        // Continue with the next middleware or route handler
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid token' });
+    }
+};
+
+module.exports = authenticateUser;
+
+module.exports = authenticateUser;
+
+
+
 module.exports = {
     userAuth,
-    findUserAndCheckLogin
+    findUserAndCheckLogin,
+    authenticateUser
    // loginAuth
 };
 
