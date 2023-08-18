@@ -693,7 +693,7 @@ try {
 
       const { email, hospitalcode } = req.body;
       let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if(emailPattern?.test(email)){
+      if(!emailPattern?.test(email)){
         return res.status(404).json({message:"email pattern not valid"})
       }
       if(!hospitalcode || hospitalcode?.trim().length === 0){
