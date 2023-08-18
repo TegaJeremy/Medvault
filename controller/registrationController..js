@@ -701,7 +701,7 @@ try {
       }
      
       //send the link of the staff registration page along sid the hospital code
-      const registrationlink =`http://myplatform.com/register/${hospitalcode}`
+      const registrationlink = `https://medvault-xixt.onrender.com/#/staffRegistration`
              
     
       //send the mail
@@ -710,10 +710,10 @@ try {
         from: process.env.SENDER_EMAIL,
         to:email,
         subject: "Registration",
-        text:`click on the link to to register, use the last digits in this link  as the hospitalcode on the registration page${registrationlink}`
-        
-      }
+        text:`click on the link to to register, use the code below as your hospital code: ${registrationlink}, hospitalcode:${hospitalcode} `
+          }
     await transporter.sendMail( mailOptions2 );
+
     
 
     res.status( 200 ).json( {

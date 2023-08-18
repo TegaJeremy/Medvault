@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
    pass: process.env.password
  },
  tls:{
-     rejectUnauthorized: false,
+     rejectUnauthorized: false, 
     },
  });
 
@@ -38,7 +38,7 @@ const createStaffprofile = async (req, res) => {
           return res.status(404).json({message:"name imput cannot be epmyt"})
         } 
         if(!regexPattern?.test( name)){
-          return res.status(404).json({message:" name can only contain letters"})
+          return res.status(404).json({message:" name can only contain letters"})  
         }  
         if(!age || age?.trim().length === 0){
           return res.status(404).json({message:"age cannot be empty"})
@@ -103,7 +103,8 @@ const createStaffprofile = async (req, res) => {
               return res.status(404).json({message:"password does not match"})
              }
                   // data.isStaff = true
-                  gethospital.staff.push(data._id);
+                  gethospital.staff.push(data._id)
+                  console.log(gethospital)
             await gethospital.save()
             const createStaff = new staffModel(data)
             // generate token
@@ -199,13 +200,14 @@ const createStaffprofile = async (req, res) => {
             await transporter.sendMail( mailOptions );
             //notify the hospitay that a user has use its codes to register
            const notifyhospital = gethospital.email
+           const hospitalname = gethospital.facilityname
            
             // const baseUrl2 = process.env.BASE_URL
             const mailOptions2 = {
                 from: process.env.SENDER_EMAIL,
                 to:notifyhospital,
                 subject: "STAFF REGISTERED",
-                text: `hospital with this mail ${email} registereg with your hospital code `,
+                text: ` hello${hospitalname} a staff with this mail ${email} has just registered on MEDVAULT with your hospital code `,
             };
             await transporter.sendMail( mailOptions2 );
             res.status(200).json({ message: "Create successful",
