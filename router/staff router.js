@@ -5,7 +5,7 @@ const { forgotPassword, changePassword, resetPassword }= require('../controller/
 const {authenticateUser}= require("../middleware/AUTH")
 const router = express.Router()
 
-router.route('/createprofile/').post(authenticateUser,createStaffprofile)
+router.route('/createprofile/').post(createStaffprofile)
 router.route("/hospitals/staff/:hospitalcode").get(authenticateUser, getAllStaffByHospital)
 router.route('/staffverifyemail/:token').post(verifyEmail)
 router.route('/staff-resend-verification').post(resendVerificationEmail)
@@ -24,3 +24,4 @@ router.route("/staff-resetpassword/:token").post(resetPassword)
 
 
 module.exports = router
+

@@ -726,7 +726,7 @@ try {
       res.status(500).json(error.message)
     }
   }
-   
+       
 module.exports = {
     register,
     verifyEmail,
