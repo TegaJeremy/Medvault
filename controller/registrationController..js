@@ -239,7 +239,7 @@ const mailOptions = {
     <body>
         <div class="container">
             <div class="header">
-                <img src="cid:unique-image-id" alt="MED VAULT Logo">
+                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT">
             </div>
             <div class="content">
                 <h1>Hello ${user.facilityname}!</h1>
@@ -255,13 +255,13 @@ const mailOptions = {
     
     
       `,
-      attachments: [
-        {
-            filename: "Medvault.png",
-            path:  "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Path to your image file
-            cid: "unique-image-id" // Use a unique CID
-        }
-    ]
+    //   attachments: [
+    //     {
+    //         filename: "Medvault.png",
+    //         path:  "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Path to your image file
+    //         cid: "unique-image-id" // Use a unique CID
+    //     }
+    // ]
       
 };
 
@@ -361,7 +361,7 @@ const resendVerificationEmail = async (req, res) => {
                       <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
                           <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
                               <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                                  <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED VAULT Logo" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+                                  <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
                               </div>
                               <div style="padding: 20px; text-align: center;">
                                   <h1>Hello ${user.facilityname}!</h1>
@@ -473,104 +473,6 @@ const resendVerificationEmail = async (req, res) => {
 }
 
 
-//creating a function to logout the user
-// const logout = async (req, res) => {
-//     try {
-//       const {hospitalcode} = req.user;
-//       console.log(req.user)
-  
-//       // Update the user's token to null
-//       const user = await registerModel.findByIdAndUpdate(hospitalcode, { token: null }, { new: true });
-  
-//       if (!user) {
-//         return res.status(404).json({
-//           message: 'User not found',
-//         });
-//       }
-//       res.status(200).json({
-//         message: 'User logged out successfully',
-//       });
-//     } catch (error) {
-//       res.status(500).json({
-//         Error: error.message,
-//       });
-//     }
-//   }
-// const logout = async (req, res) => {
-  // try {
-  //   // Assuming req.user contains the user ID and token information
-  //   const { token } = req.user;
-
-  //   // Update the user's token to null in the database
-  //   // Replace 'UserModel' with the actual model representing your user collection
-  //   const updatedUser = await registerModel.findByIdAndUpdate(
-  //     token,
-  //     { token: null },
-  //     { new: true }
-  //   );
-
-  //   if (!updatedUser) {
-  //     return res.status(404).json({
-  //       message: 'User not found',
-  //     });
-  //   }
-
-  //   res.status(200).json({
-  //     message: 'User logged out successfully',
-  //   });
-  // } catch (error) {
-  //   res.status(500).json({
-  //     Error: error.message,
-  //   });
-  // }
-//};
-
-// const logout = async (req, res) => {
-//   try {
-//     // Assuming req.user contains the authenticated user's information
-//     const { hospitalcode } = req.params.hospitalcode;
-//     console.log(req.user)
-//     // Update the user's token to null in the database
-//     const updatedUser = await registerModel.findByIdAndUpdate(
-//       hospitalcode,
-//       { token: null },
-//       { new: true }
-//     );
-
-//     if (!updatedUser) {
-//       return res.status(404).json({
-//         message: 'User not found',
-//       });
-//     }
-
-//     res.status(200).json({
-//       message: 'User logged out successfully',
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       Error: error.message,
-//     });
-//   }
-// };
-// Sign Out
-// const logout = async (req, res)=>{
-//   try {
-//       const { hospitalId } = req.params;
-//       const blacklist = [];
-//       const hasAuthorization = req.headers.authorization;
-//       const token = hasAuthorization.split(" ")[1];
-//       blacklist.push(token);
-//       const logout = await registerModel.findByIdAndUpdate(hospitalId, {islogin: false}); 
-//       res.status(200).json({
-//           message: 'Logged out successfully'
-//       })
-//       console.log()
-//   } catch (error) {
-//       res.status(500).json({
-//           message: error.message
-//       })
-//   }
-// };
 const logout = async (req, res) => {
   try {
       // Assuming req.user contains the user ID and token information
@@ -603,36 +505,7 @@ module.exports = logout;
 
 
 
-// const logout = async (req, res) => {
-//   try {
-//     const { hospitalId } = req.params;
-//     const hasAuthorization = req.headers.authorization;
 
-//     if (!hasAuthorization) {
-//       return res.status(401).json({
-//         message: 'Unauthorized'
-//       });
-//     }
-
-//     const token = hasAuthorization.split(' ')[1];
-//     const decodedToken = jwt.decode(token, { complete: true }); // Decode the token
-
-//     // Invalidate the token by adding it to a blacklist (you might want to store this list in a database)
-//     const blacklistedTokens = []; // Store blacklisted tokens
-//     blacklistedTokens.push(token);
-
-//     // Update the login status for the hospital
-//     const updatedHospital = await registerModel.findByIdAndUpdate(hospitalId, { islogin: false });
-
-//     res.status(200).json({
-//       message: 'Logged out successfully'
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: error.message
-//     });
-//   }
-// };
 
 const getHospitalWithStaffAndPatients = async (req, res) => {
   const { hospitalId } = req.params;

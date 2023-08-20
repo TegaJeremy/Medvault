@@ -35,8 +35,10 @@ hospitalLogo: {
 },
   
 staff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Staff' }],
-    patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
-    LGA:{
+
+ patients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' }],
+ 
+LGA:{
     type:String,
     required:true["LGA is required"]
 },

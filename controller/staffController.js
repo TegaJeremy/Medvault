@@ -102,9 +102,12 @@ const createStaffprofile = async (req, res) => {
             if (password !==confirmPassword ){
               return res.status(404).json({message:"password does not match"})
              }
+             // turn the default false in the staff model to true
                    data.isStaff = true
-                  gethospital.staff.push(data._id)
-                  await gethospital.save()
+                   //push the staff to the hospital model 
+
+                 
+
             const createStaff = new staffModel(data)
             // generate token
             const newToken = jwt.sign({email:data.email , islogin: data.islogin}, process.env.secretKey, { expiresIn: "1d" })
@@ -114,6 +117,9 @@ const createStaffprofile = async (req, res) => {
             createStaff.token = newToken
 
             await createStaff.save()
+            gethospital.staff.push(createStaff._id)
+            // save the hospital
+              await gethospital.save()
             const link = `https://medvault-xixt.onrender.com/#/verification/{newToken}`;
             // send verification link
             //const baseUrl = process.env.BASE_URL
@@ -124,7 +130,7 @@ const createStaffprofile = async (req, res) => {
             //     html: `Please click on the link to verify your email: <a href="${link}/">Verify Email</a>`,
             // };
             //<!DOCTYPE html>
-           // <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">(future local image testing)
+           // <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">(future local image)
               html: `
               
               <!DOCTYPE html>
@@ -186,8 +192,8 @@ const createStaffprofile = async (req, res) => {
                   <div class="container">
                       <div class="header">
                         
-                          <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">
-                          https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png
+                          <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" style="max-width: 100%; height: auto;">
+                         
                           <h1 style="color: #ff6600;">Verify Your Account</h1>
                       </div>
                       <div class="content">
@@ -198,13 +204,13 @@ const createStaffprofile = async (req, res) => {
               </body>
               </html>
               `,
-              attachments: [
-                {
-                    filename: "Medvault.png",
-                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
-                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
-                }
-            ]
+            //   attachments: [
+            //     {
+            //         filename: "Medvault.png",
+            //         path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+            //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+            //     }
+            // ]
               
 }
 
@@ -278,7 +284,7 @@ const createStaffprofile = async (req, res) => {
                   <body>
                       <div class="container">
                           <div class="header">
-                              <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">
+                              <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-vault" style="max-width: 100%; height: auto;">
                               <h1 style="color: #ff6600;">Staff Registered</h1>
                           </div>
                           <div class="content">
@@ -289,13 +295,13 @@ const createStaffprofile = async (req, res) => {
                   </body>
                   </html>
               `,
-              attachments: [
-                {
-                    filename: "Medvault.png",
-                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
-                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
-                }
-            ]
+            //   attachments: [
+            //     {
+            //         filename: "Medvault.png",
+            //         path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+            //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+            //     }
+            // ]
           };
           
             await transporter.sendMail( mailOptions2 );
@@ -462,7 +468,7 @@ const resendVerificationEmail = async (req, res) => {
               <body>
                   <div class="container">
                       <div class="header">
-                          <img src="cid:unique-image-id" alt="Your Image">
+                          <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="med-vault">
                       </div>
                       <div class="content">
                           <p>Please click on the link to verify your email:</p>
@@ -474,13 +480,13 @@ const resendVerificationEmail = async (req, res) => {
               `,
 
 
-              attachments: [
-                {
-                    filename: "Medvault.png",
-                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
-                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
-                }
-            ]
+            //   attachments: [
+            //     {
+            //         filename: "Medvault.png",
+            //         path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+            //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+            //     }
+            // ]
                     }
               
             await transporter.sendMail( mailOptions );

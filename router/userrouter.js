@@ -33,7 +33,7 @@ router.route("/deleteaccount/:hospitalcode").post(authenticateUser,deleteAccount
 router.route('/creatingastaff').post(authenticateUser, createstaff)
 
 //geting hospital
-router.route("/gethospital/:hospitalId").get(authenticateUser,getHospitalWithStaffAndPatients)
+router.route("/gethospital/:hospitalId").get(authenticateUser, getHospitalWithStaffAndPatients)
 
 
 
