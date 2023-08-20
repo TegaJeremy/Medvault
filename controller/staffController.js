@@ -124,6 +124,7 @@ const createStaffprofile = async (req, res) => {
             //     html: `Please click on the link to verify your email: <a href="${link}/">Verify Email</a>`,
             // };
             //<!DOCTYPE html>
+           // <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">(future local image testing)
               html: `
               
               <!DOCTYPE html>
@@ -184,7 +185,9 @@ const createStaffprofile = async (req, res) => {
               <body>
                   <div class="container">
                       <div class="header">
+                        
                           <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">
+                          https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png
                           <h1 style="color: #ff6600;">Verify Your Account</h1>
                       </div>
                       <div class="content">
@@ -469,7 +472,7 @@ const resendVerificationEmail = async (req, res) => {
               </body>
               </html>
               `,
-              
+
 
               attachments: [
                 {

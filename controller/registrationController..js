@@ -375,13 +375,13 @@ const resendVerificationEmail = async (req, res) => {
                   </body>
                   </html>
               `,
-              attachments: [
-                  {
-                      filename: "Medvault.png",
-                      path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
-                      cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
-                  }
-              ]
+              // attachments: [
+              //     {
+              //         filename: "Medvault.png",
+              //         path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
+              //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+              //     }
+              // ]
           };
           
 
