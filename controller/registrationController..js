@@ -361,7 +361,7 @@ const resendVerificationEmail = async (req, res) => {
                       <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
                           <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
                               <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                                  <img src="cid:unique-image-id" alt="MED VAULT Logo" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+                                  <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED VAULT Logo" style="max-width: 80%; display: block; margin: 0 auto 10px;">
                               </div>
                               <div style="padding: 20px; text-align: center;">
                                   <h1>Hello ${user.facilityname}!</h1>
@@ -378,7 +378,7 @@ const resendVerificationEmail = async (req, res) => {
               attachments: [
                   {
                       filename: "Medvault.png",
-                      path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+                      path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
                       cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
                   }
               ]
