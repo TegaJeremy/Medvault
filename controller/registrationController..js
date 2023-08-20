@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const cloudinary = require('../middleware/cloudinary')
+
+
 // const validator = require('../middleware/validation')
 //const Validator = require('fastest-validator');
 
@@ -83,8 +85,7 @@ const register = async (req, res)=>{
          res.status( 400 ).json( {
              message: `user with this email: ${email} already exist.`
          })
-    
-    
+        
         }else{
           const hospitalphoto = await cloudinary.uploader.upload(req.files.hospitalLogo.tempFilePath, (error, hospitalLogo) => {
             try{return hospitalLogo}
@@ -148,63 +149,120 @@ const register = async (req, res)=>{
             const baseUrl = process.env.BASE_URL;
  const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
  //"/verification/:token" (How frontend should write route)
+//  const scriptDirectory = __dirname;
+//  const relativeImagePath = path.join(scriptDirectory, "WhatsApp_Image_2023-08-18_at_7.10.31_PM-removebg-preview.png");
+
+
  
 //const link = `http://www.google.com`
 const mailOptions = {
     from: process.env.SENDER_EMAIL,
     to: email,
     subject: "Verify your account",
-    html: `
-        <html>
-        <head>
-            <style>
-                /* Add your CSS styles here */
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 0;
+    html:`<!DOCTYPE html>
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            /* Add your CSS styles here */
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #e8e8e8;
+            }
+    
+            .container {
+                background-color: #ffffff;
+                padding: 20px;
+                margin: 10vh auto; /* Center the container vertically and horizontally */
+                max-width: 80%; /* Limit container width for better readability on larger screens */
+                box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+                border-radius: 10px;
+            }
+    
+            .header {
+                background-color: #020202;
+                color: #fff;
+                padding: 10px;
+                text-align: center;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+    
+            .header img {
+                max-width: 80%; /* Make sure the image fits within its container */
+                display: block; /* Remove any residual space below the image */
+                margin: 0 auto 10px; /* Center the image horizontally and add margin below it */
+            }
+    
+            .content {
+                padding: 10px;
+                text-align: center; /* Center-align content within the div */
+            }
+    
+            .button {
+                background-color: red;
+                border: none;
+                color: #fff;
+                padding: 15px 30px; /* Increase button padding for larger size */
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 18px; /* Increase font size for the button */
+                border-radius: 5px;
+                cursor: pointer; /* Add cursor pointer on hover */
+                transition: background-color 0.3s, color 0.3s; /* Add transitions for button hover effects */
+            }
+    
+            .button:hover {
+                background-color: #019599;
+            }
+    
+            /* Animation for h1 tags */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
                 }
-                .container {
-                    background-color: #f4f4f4;
-                    padding: 20px;
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
-                .header {
-                    background-color: #007BFF;
-                    color: #fff;
-                    padding: 10px;
-                    text-align: center;
-                }
-                .content {
-                    padding: 20px;
-                }
-                .button {
-                    background-color: #007BFF;
-                    border: none;
-                    color: #fff;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    font-size: 16px;
-                    border-radius: 5px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                <h1>hello ${user.facilityname}</h1>
-                    <h1>welcome to medvault</h1>
-                    
-                </div>
-                <div class="content">
-                    <p>Please kindly click on the link below to verify your account:</p>
-                    <a class="button" href="${link}">Verify Email</a>
-                </div>
+            }
+    
+            .content h1 {
+                animation: fadeIn 1s ease-in-out; /* Apply the animation to h1 elements */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="cid:unique-image-id" alt="MED VAULT Logo">
             </div>
-        </body>
-        </html>
-    `
+            <div class="content">
+                <h1>Hello ${user.facilityname}!</h1>
+                <h2>Welcome to MedVault!</h2>
+                <p>We're excited to have you get started.</p>
+                <p>First, you need to confirm your account.</p>
+                <a class="button" href="${link}">Verify Email</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    
+    
+    
+      `,
+      attachments: [
+        {
+            filename: "Medvault.png",
+            path:  "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Path to your image file
+            cid: "unique-image-id" // Use a unique CID
+        }
+    ]
+      
 };
 
 // Use the 'mailOptions' object in your email sending code
@@ -284,17 +342,48 @@ const resendVerificationEmail = async (req, res) => {
         }
 
         // create a token
-            const token = await jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
+            const token = jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
             
              // send verification email
             const baseUrl = process.env.BASE_URL
             const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
             const mailOptions = {
-                from: process.env.SENDER_EMAIL,
-                to: user.email,
-                subject: "Email Verification",
-                html: `welcome to medvault, please kindly click on this link${link} to verify your account`,
-            };
+              from: process.env.SENDER_EMAIL,
+              to: user.email,
+              subject: "Email Verification",
+              html: `
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                      <meta name="viewport" content="width=device-width, initial-scale=1">
+                  </head>
+                  <body>
+                      <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
+                          <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
+                              <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                                  <img src="cid:unique-image-id" alt="MED VAULT Logo" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+                              </div>
+                              <div style="padding: 20px; text-align: center;">
+                                  <h1>Hello ${user.facilityname}!</h1>
+                                  <h2>Welcome to MedVault!</h2>
+                                  <p>We're excited to have you get started.</p>
+                                  <p>First, you need to confirm your account. Please kindly click on the link below to verify your email:</p>
+                                  <a href="${link}" style="background-color: #1ebfc1; border: none; color: #fff; padding: 15px 30px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s;">Verify Email</a>
+                              </div>
+                          </div>
+                      </div>
+                  </body>
+                  </html>
+              `,
+              attachments: [
+                  {
+                      filename: "Medvault.png",
+                      path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+                      cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+                  }
+              ]
+          };
+          
 
             await transporter.sendMail( mailOptions );
 
@@ -710,8 +799,67 @@ try {
         from: process.env.SENDER_EMAIL,
         to:email,
         subject: "Registration",
-        text:`click on the link to to register, use the code below as your hospital code: ${registrationlink}, hospitalcode:${hospitalcode} `
-          }
+      //   text:`click on the link to to register, use the code below as your hospital code: ${registrationlink}, hospitalcode:${hospitalcode} `
+      //     }
+      html:`
+      <!DOCTYPE html>
+     
+<html>:
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: #00FFFF;
+      font-family: Arial, sans-serif;
+      height:100%
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .content {
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      color:rgb(253, 250, 250)
+    }
+    .content p {
+      margin-bottom: 10px;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #00FFFF;
+      color: #000000;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Registration</h1>
+    </div>
+    <div class="content">
+      <p>Click on the link below to register:</p>
+      <p>Use the following code as your hospital code: <strong>${hospitalcode}</strong></p>
+      <p><a href="${registrationlink}" class="cta-button">Register Now</a></p>
+    </div>
+  </div>
+</body>
+</html>`
+  }
+
     await transporter.sendMail( mailOptions2 );
 
     
@@ -727,6 +875,7 @@ try {
     }
   }
        
+
 module.exports = {
     register,
     verifyEmail,

@@ -25,9 +25,9 @@ const createpatient = async (req, res)=>{
             if(!dateOfBirth || dateOfBirth?.trim().length === 0){
               return res.status(404).json({message:" date of birth cannot be empty"})
             } 
-            if(!gender || gender?.trim().length === 0){
-              return res.status(404).json({message:"gender cannot be empty"})
-            } 
+            // if(!gender || gender?.trim().length === 0){
+            //   return res.status(404).json({message:"gender cannot be empty"})
+            // } 
             if(!email || !emailPattern?.test(email)){
               return res.status(404).json({message:"email not valid"})
             }
@@ -37,9 +37,9 @@ const createpatient = async (req, res)=>{
             if(!bloodGroup || bloodGroup?.trim().length === 0){
               return res.status(404).json({message:"bloodGroup cannot be empty"})
             } 
-            if(!relationshipStatus){
-              return res.status(404).json({message:"relationshipStatus cannot be empty"})
-            } 
+            // if(!relationshipStatus){
+            //   return res.status(404).json({message:"relationshipStatus cannot be empty"})
+            // } 
             if(!spouseName){
               return res.status(404).json({message:"spouseName cannot be empty"})
             } 

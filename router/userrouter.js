@@ -30,7 +30,7 @@ router.route("/updatehospitalinfo/:hospitalcode").putauthenticateUser,(updatehos
 router.route("/deleteaccount/:hospitalcode").post(authenticateUser,deleteAccount)
 
 //creating a staff(sending staff a link)
-router.route('/creatingastaff').post(authenticateUser,createstaff)
+router.route('/creatingastaff').post(authenticateUser, createstaff)
 
 //geting hospital
 router.route("/gethospital/:hospitalId").get(authenticateUser,getHospitalWithStaffAndPatients)

@@ -102,10 +102,9 @@ const createStaffprofile = async (req, res) => {
             if (password !==confirmPassword ){
               return res.status(404).json({message:"password does not match"})
              }
-                  // data.isStaff = true
+                   data.isStaff = true
                   gethospital.staff.push(data._id)
-                  console.log(gethospital)
-            await gethospital.save()
+                  await gethospital.save()
             const createStaff = new staffModel(data)
             // generate token
             const newToken = jwt.sign({email:data.email , islogin: data.islogin}, process.env.secretKey, { expiresIn: "1d" })
@@ -126,74 +125,84 @@ const createStaffprofile = async (req, res) => {
             // };
             //<!DOCTYPE html>
               html: `
+              
               <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Reset default styles */
-        body, p, h1, h2, h3, h4, h5, h6 {
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Main styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f7f7f7;
-            border-radius: 10px;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333333;
-        }
-
-        .content {
-            margin-bottom: 20px;
-            color: #555555;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        /* Responsive adjustments */
-        @media screen and (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1 style="color: #ff6600;">Verify Your Account</h1>
-        </div>
-        <div class="content">
-            <p>Thank you for signing up! Please click on the link below to verify your email:</p>
-            <p><a class="button" href="${link}/">Verify Email</a></p>
-        </div>
-    </div>
-</body>
-</html>
-`
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <style>
+                      /* Reset default styles */
+                      body, p, h1, h2, h3, h4, h5, h6 {
+                          margin: 0;
+                          padding: 0;
+                      }
+              
+                      /* Main styles */
+                      body {
+                          font-family: Arial, sans-serif;
+                          background-color: #f5f5f5;
+                      }
+              
+                      .container {
+                          max-width: 600px;
+                          margin: 0 auto;
+                          padding: 20px;
+                          background-color: black;
+                          border-radius: 10px;
+                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                      }
+              
+                      .header {
+                          text-align: center;
+                          margin-bottom: 20px;
+                          color: #333333;
+                      }
+              
+                      .content {
+                          margin-bottom: 20px;
+                          color: white;
+                      }
+              
+                      .button {
+                          display: inline-block;
+                          padding: 10px 20px;
+                          background-color: #007bff;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 5px;
+                      }
+              
+                      /* Responsive adjustments */
+                      @media screen and (max-width: 480px) {
+                          .container {
+                              padding: 10px;
+                          }
+                      }
+                  </style>
+              </head>
+              <body>
+                  <div class="container">
+                      <div class="header">
+                          <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">
+                          <h1 style="color: #ff6600;">Verify Your Account</h1>
+                      </div>
+                      <div class="content">
+                          <p>Thank you for signing up! Please click on the link below to verify your email:</p>
+                          <p><a class="button" href="${link}/">Verify Email</a></p>
+                      </div>
+                  </div>
+              </body>
+              </html>
+              `,
+              attachments: [
+                {
+                    filename: "Medvault.png",
+                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+                }
+            ]
+              
 }
 
 
@@ -204,11 +213,88 @@ const createStaffprofile = async (req, res) => {
            
             // const baseUrl2 = process.env.BASE_URL
             const mailOptions2 = {
-                from: process.env.SENDER_EMAIL,
-                to:notifyhospital,
-                subject: "STAFF REGISTERED",
-                text: ` hello${hospitalname} a staff with this mail ${email} has just registered on MEDVAULT with your hospital code `,
-            };
+              from: process.env.SENDER_EMAIL,
+              to: notifyhospital,
+              subject: "STAFF REGISTERED",
+              html: `
+                  <!DOCTYPE html>
+                  <html lang="en">
+                  <head>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <style>
+                          /* Reset default styles */
+                          body, p, h1, h2, h3, h4, h5, h6 {
+                              margin: 0;
+                              padding: 0;
+                          }
+          
+                          /* Main styles */
+                          body {
+                              font-family: Arial, sans-serif;
+                              background-color: black;
+                          }
+          
+                          .container {
+                              max-width: 600px;
+                              margin: 0 auto;
+                              padding: 20px;
+                              background-color: black;
+                              border-radius: 10px;
+                              box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                          }
+          
+                          .header {
+                              text-align: center;
+                              margin-bottom: 20px;
+                              color: #333333;
+                          }
+          
+                          .content {
+                              margin-bottom: 20px;
+                              color: white;
+                          }
+          
+                          .button {
+                              display: inline-block;
+                              padding: 10px 20px;
+                              background-color: #007bff;
+                              color: #ffffff;
+                              text-decoration: none;
+                              border-radius: 5px;
+                          }
+          
+                          /* Responsive adjustments */
+                          @media screen and (max-width: 480px) {
+                              .container {
+                                  padding: 10px;
+                              }
+                          }
+                      </style>
+                  </head>
+                  <body>
+                      <div class="container">
+                          <div class="header">
+                              <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">
+                              <h1 style="color: #ff6600;">Staff Registered</h1>
+                          </div>
+                          <div class="content">
+                              <p>Hello ${hospitalname},</p>
+                              <p>A staff with this email ${email} has just registered on MEDVAULT with your hospital code.</p>
+                          </div>
+                      </div>
+                  </body>
+                  </html>
+              `,
+              attachments: [
+                {
+                    filename: "Medvault.png",
+                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+                }
+            ]
+          };
+          
             await transporter.sendMail( mailOptions2 );
             res.status(200).json({ message: "Create successful",
              data: createStaff ,
@@ -306,12 +392,94 @@ const resendVerificationEmail = async (req, res) => {
              // send verification email
             const baseUrl = process.env.BASE_URL
             const mailOptions = {
-                from: process.env.SENDER_EMAIL,
-                to: user.email,
-                subject: "Email Verification",
-                html: `Please click on the link to verify your email: <a href="http://localhost:7000/api/users/verify-email/${ token }">Verify Email</a>`,
-            };
+              from: process.env.SENDER_EMAIL,
+              to: user.email,
+              subject: "Email Verification",
+              html: `
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <style>
+                      /* Reset default styles */
+                      body, p, h1, h2, h3, h4, h5, h6 {
+                          margin: 0;
+                          padding: 0;
+                      }
+              
+                      /* Main styles */
+                      body {
+                          font-family: Arial, sans-serif;
+                          background-color: #f5f5f5;
+                      }
+              
+                      .container {
+                          max-width: 600px;
+                          margin: 0 auto;
+                          background-color: #f7f7f7;
+                          border-radius: 10px;
+                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                      }
+              
+                      .header {
+                          text-align: center;
+                          background-color: black;
+                          border-top-left-radius: 10px;
+                          border-top-right-radius: 10px;
+                      }
+              
+                      .header img {
+                          max-width: 100%;
+                          height: auto;
+                      }
+              
+                      .content {
+                          padding: 20px;
+                          color: black;
+                      }
+              
+                      .button {
+                          display: inline-block;
+                          padding: 10px 20px;
+                          background-color: #007bff;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 5px;
+                      }
+              
+                      /* Responsive adjustments */
+                      @media screen and (max-width: 480px) {
+                          .container {
+                              padding: 10px;
+                          }
+                      }
+                  </style>
+              </head>
+              <body>
+                  <div class="container">
+                      <div class="header">
+                          <img src="cid:unique-image-id" alt="Your Image">
+                      </div>
+                      <div class="content">
+                          <p>Please click on the link to verify your email:</p>
+                          <p><a class="button" href="http://localhost:7000/api/users/verify-email/${token}">Verify Email</a></p>
+                      </div>
+                  </div>
+              </body>
+              </html>
+              `,
+              
 
+              attachments: [
+                {
+                    filename: "Medvault.png",
+                    path: "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Replace with the correct path to your image file
+                    cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+                }
+            ]
+                    }
+              
             await transporter.sendMail( mailOptions );
 
         res.status( 200 ).json( {
