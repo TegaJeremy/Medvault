@@ -299,7 +299,10 @@ const verifyEmail = async (req, res) => {
         // verify the token
         const { email } = jwt.verify( token, process.env.secretKey );
 
-        const user = await registerModel.findOne( { email } );
+        const admin = await registerModel.findOne( { email } );
+        const staff = await staffModel.findOne({ email });
+
+        const user = admin || staff;
 
         // update the user verification
         user.isVerified = true;
@@ -325,162 +328,360 @@ const verifyEmail = async (req, res) => {
 
 
 // resend verification
-const resendVerificationEmail = async (req, res) => {
-    try {
-        // get user email from request body
-        const { email } = req.body;
+// const resendVerificationEmail = async (req, res) => {
+//     try {
+//         // get user email from request body
+//         const { email } = req.body;
 
-        // find user
-        const user = await registerModel.findOne( { email } );
-        if ( !user ) {
-            return res.status( 404 ).json( {
-                error: "User not found"
-            } );
-        }
-        if(user.isVerified === true){
-          return res.status(200).json({message:"user already verified"})
-        }
+//         // find user
+//         const user = await registerModel.findOne( { email } );
+//         if ( !user ) {
+//             return res.status( 404 ).json( {
+//                 error: "User not found"
+//             } );
+//         }
+//         if(user.isVerified === true){
+//           return res.status(200).json({message:"user already verified"})
+//         }
 
-        // create a token
-            const token = jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
+//         // create a token
+//             const token = jwt.sign({ email:user.email, hospitalcode:user.hospitalcode, isVerified:user.isVerified }, process.env.secretKey, { expiresIn: "10m" } );
             
-             // send verification email
-            const baseUrl = process.env.BASE_URL
-            const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
-            const mailOptions = {
-              from: process.env.SENDER_EMAIL,
-              to: user.email,
-              subject: "Email Verification",
-              html: `
-                  <!DOCTYPE html>
-                  <html>
-                  <head>
-                      <meta name="viewport" content="width=device-width, initial-scale=1">
-                  </head>
-                  <body>
-                      <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
-                          <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
-                              <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                                  <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
-                              </div>
-                              <div style="padding: 20px; text-align: center;">
-                                  <h1>Hello ${user.facilityname}!</h1>
-                                  <h2>Welcome to MedVault!</h2>
-                                  <p>We're excited to have you get started.</p>
-                                  <p>First, you need to confirm your account. Please kindly click on the link below to verify your email:</p>
-                                  <a href="${link}" style="background-color: #1ebfc1; border: none; color: #fff; padding: 15px 30px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s;">Verify Email</a>
-                              </div>
-                          </div>
-                      </div>
-                  </body>
-                  </html>
-              `,
-              // attachments: [
-              //     {
-              //         filename: "Medvault.png",
-              //         path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
-              //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
-              //     }
-              // ]
-          };
+//              // send verification email
+//             const baseUrl = process.env.BASE_URL
+//             const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
+//             const mailOptions = {
+//               from: process.env.SENDER_EMAIL,
+//               to: user.email,
+//               subject: "Email Verification",
+//               html: `
+//                   <!DOCTYPE html>
+//                   <html>
+//                   <head>
+//                       <meta name="viewport" content="width=device-width, initial-scale=1">
+//                   </head>
+//                   <body>
+//                       <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
+//                           <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
+//                               <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+//                                   <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+//                               </div>
+//                               <div style="padding: 20px; text-align: center;">
+//                                   <h1>Hello ${user.facilityname}!</h1>
+//                                   <h2>Welcome to MedVault!</h2>
+//                                   <p>We're excited to have you get started.</p>
+//                                   <p>First, you need to confirm your account. Please kindly click on the link below to verify your email:</p>
+//                                   <a href="${link}" style="background-color: #1ebfc1; border: none; color: #fff; padding: 15px 30px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s;">Verify Email</a>
+//                               </div>
+//                           </div>
+//                       </div>
+//                   </body>
+//                   </html>
+//               `,
+//               // attachments: [
+//               //     {
+//               //         filename: "Medvault.png",
+//               //         path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
+//               //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+//               //     }
+//               // ]
+//           };
           
 
-            await transporter.sendMail( mailOptions );
+//             await transporter.sendMail( mailOptions );
 
-        res.status( 200 ).json( {
-            message: `Verification email sent successfully to your email: ${user.email}`,
-            data:token
+//         res.status( 200 ).json( {
+//             message: `Verification email sent successfully to your email: ${user.email}`,
+//             data:token
             
-        } );
+//         } );
     
 
-    } catch ( error ) {
-        res.status( 500 ).json( {
-            message: error.message
-        })
+//     } catch ( error ) {
+//         res.status( 500 ).json( {
+//             message: error.message
+//         })
     
-    }
-}
+//     }
+// }
+const resendVerificationEmail = async (req, res) => {
+  try {
+      // get user email from request body
+      const { email } = req.body;
+
+      // Find user in the hospital collection
+      const hospitalUser = await registerModel.findOne({ email });
+
+      // Find user in the staff collection
+      const staffUser = await staffModel.findOne({ email });
+
+      // Determine if the user exists and is verified in either collection
+      let user;
+      if (hospitalUser && hospitalUser.isVerified) {
+          user = hospitalUser;
+      } else if (staffUser && staffUser.isVerified) {
+          user = staffUser;
+      } else {
+          return res.status(404).json({
+              error: "User not found or not verified"
+          });
+      }
+      if (user.isVerified){
+        return res.status(200).json({message:'user already verified'})
+      }
+
+      // create a token
+      const token = jwt.sign({ email: user.email, hospitalcode: user.hospitalcode, isVerified: user.isVerified }, process.env.secretKey, { expiresIn: "10m" });
+
+      // send verification email
+      const baseUrl = process.env.BASE_URL;
+      const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
+      const mailOptions = {
+          from: process.env.SENDER_EMAIL,
+          to: user.email,
+          subject: "Email Verification",
+          html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                </head>
+                <body>
+                    <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
+                        <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
+                            <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+                            </div>
+                            <div style="padding: 20px; text-align: center;">
+                                <h1>Hello ${user.facilityname || user.name}!</h1>
+                                <h2>Welcome to MedVault!</h2>
+                                <p>We're excited to have you get started.</p>
+                                <p>First, you need to confirm your account. Please kindly click on the link below to verify your email:</p>
+                                <a href="${link}" style="background-color: #1ebfc1; border: none; color: #fff; padding: 15px 30px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s;">Verify Email</a>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `,
+          // attachments: [
+          //     {
+          //         filename: "Medvault.png",
+          //         path: "https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png", // Replace with the correct path to your image file
+          //         cid: "unique-image-id" // Use the same unique id as in the <img> src attribute
+          //     }
+          // ]
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(200).json({
+          message: `Verification email sent successfully to your email: ${user.email}`,
+          data: token
+      });
+
+  } catch (error) {
+      res.status(500).json({
+          message: error.message
+      });
+  }
+};
+
 
 
  // User login
- const login = async (req, res) => {
-    try {
-    // Extract the user's username, email and password
-        const {email, password } = req.body;
+//  const login = async (req, res) => {
+//     try {
+//     // Extract the user's username, email and password
+//         const {email, password } = req.body;
 
-    // find user by their registered email or username
-        const checkUser = await registerModel.findOne({email})
-        // const checkUser = await registerModel.findOne({ $or: [{ username }, { email }] })
+//     // find user by their registered email or username
+//         const checkUser = await registerModel.findOne({email})
+//         // const checkUser = await registerModel.findOne({ $or: [{ username }, { email }] })
 
-        // check if the user exists
-        if (!checkUser) {
-            return res.status(404).json({
-                Failed: 'User not found'
-            })
-        }
+//         // check if the user exists
+//         if (!checkUser) {
+//             return res.status(404).json({
+//                 Failed: 'User not found'
+//             })
+//         }
 
-      // Compare user's password with the saved password.
-        const checkPassword = bcrypt.compareSync(password, checkUser.password)
-        checkUser.islogin = true
-      // Check for password error
-        if (!checkPassword) {
-            return res.status(404).json({
-                Message: 'Login Unsuccessful',
-                Failed: 'Invalid password'
-            })
-        }
+//       // Compare user's password with the saved password.
+//         const checkPassword = bcrypt.compareSync(password, checkUser.password)
+//         checkUser.islogin = true
+//       // Check for password error
+//         if (!checkPassword) {
+//             return res.status(404).json({
+//                 Message: 'Login Unsuccessful',
+//                 Failed: 'Invalid password'
+//             })
+//         }
 
-        // Check if the user if verified
-        if (!checkUser.isVerified) {
-            return res.status(404).json({
-              message: `User with this email: ${email} is not verified.`
-            })
-          }
+//         // Check if the user if verified
+//         if (!checkUser.isVerified) {
+//             return res.status(404).json({
+//               message: `User with this email: ${email} is not verified.`
+//             })
+//           }
 
-        const token = jwt.sign({
-           email:checkUser.email, 
-           hospitalcode:checkUser.hospitalcode, 
-           isVerified:checkUser.isVerified,
-           isLogin: checkUser.islogin,
-          userId: checkUser._id,
-                       // isAdmin: checkUser.isAdmin,
-            // isSuperAdmin: checkUser.isSuperAdmin
+//         const token = jwt.sign({
+//            email:checkUser.email, 
+//            hospitalcode:checkUser.hospitalcode, 
+//            isVerified:checkUser.isVerified,
+//            isLogin: checkUser.islogin,
+//           userId: checkUser._id,
+//                        // isAdmin: checkUser.isAdmin,
+//             // isSuperAdmin: checkUser.isSuperAdmin
 
-        },
-            process.env.secretKey, { expiresIn: "1d" })
+//         },
+//             process.env.secretKey, { expiresIn: "1d" })
 
-        checkUser.token = token
+//         checkUser.token = token
 
-        checkUser.save()
+//         checkUser.save()
 
-        res.status(200).json({
-            message: 'Login successful',
-            data: {
+//         res.status(200).json({
+//             message: 'Login successful',
+//             data: {
 
-                id: checkUser._id,  
-                token: checkUser.token
+//                 id: checkUser._id,  
+//                 token: checkUser.token
 
-            }
+//             }
             
-        })
+//         })
 
-    } catch (error) {
-        res.status(500).json({
-            Error: error.message
-        })
-    }
-}
+//     } catch (error) {
+//         res.status(500).json({
+//             Error: error.message
+//         })
+//     }
+// }
+//this login is for both admin and staff
+const login = async (req, res) => {
+  try {
+      // Extract the user's email and password from the request
+      const { email, password } = req.body;
+
+      // Try to find a user (either hospital or staff) with the provided email
+      const hospital = await registerModel.findOne({ email });
+      const staff = await staffModel.findOne({ email });
+
+      // Check if either a hospital or staff with the email exists
+      if (!hospital && !staff) {
+          return res.status(404).json({
+              message: 'User not found',
+          });
+      }
+
+      // Determine the user type (hospital or staff) based on which one exists
+      const user = hospital || staff;
+
+      // Compare the provided password with the user's hashed password
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+
+      if (!isPasswordValid) {
+          return res.status(401).json({
+              message: 'Login failed',
+              error: 'Invalid password',
+          });
+      }
+
+      // Check if the user is verified (you can add more checks here)
+      if (!user.isVerified) {
+          return res.status(401).json({
+              message: 'Login failed',
+              error: 'User is not verified',
+          });
+      }
+
+      // Determine the role of the user based on which model was used
+      const LoginRole = hospital ? 'Admin' : 'staff';
+
+      // Generate a JSON Web Token (JWT) for authentication
+      const token = jwt.sign(
+          {
+              email: user.email,
+              userId: user._id,
+              hospitalcode: user.hospitalcode,
+              LoginRole,
+              isStaff: user.isStaff,
+              islogin: user.islogin,
+              isAdmin: user.isAdmin
+          },
+          process.env.secretKey,
+          { expiresIn: '1d' }
+      );
+      user.islogin = true
+
+      // Update the user's token (you may want to store this token in the database)
+      user.token = token;
+      await user.save();
+
+      // Return a successful response with the JWT and role
+      res.status(200).json({
+          message: 'Login successful',
+          data: {
+              id: user._id,
+              token: user.token,
+              LoginRole,
+          },
+      });
+  } catch (error) {
+      res.status(500).json({
+          message: 'Internal server error',
+          error: error.message,
+      });
+  }
+};
 
 
+
+// const logout = async (req, res) => {
+//   try {
+//       // Assuming req.user contains the user ID and token information
+//       const { hospitalId} = req.params;
+
+//       // Update the user's islogin property to false and token to null in the database
+//       const updatedUser = await registerModel.findByIdAndUpdate(
+//         hospitalId,
+//           { islogin: false, token: null },
+//           { new: true }
+//       );
+
+//       if (!updatedUser) {
+//           return res.status(404).json({
+//               message: 'User not found',
+//           });
+//       }
+
+//       res.status(200).json({
+//           message: 'User logged out successfully',
+//       });
+//   } catch (error) {
+//       res.status(500).json({
+//           Error: error.message,
+//       });
+//   }
+// };
+
+
+//this logout is for both admin and staff
 const logout = async (req, res) => {
   try {
-      // Assuming req.user contains the user ID and token information
-      const { hospitalId} = req.params;
+      // Extract the user's ID from the request parameters
+      const { userId } = req.params;
+
+      // Check if it's a hospital or staff
+      const isHospital = await registerModel.exists({ _id: userId });
+      const isStaff = await staffModel.exists({ _id: userId });
+
+      // Determine the user model to use (either hospital or staff)
+      const UserModel = isHospital ? registerModel : staffModel;
 
       // Update the user's islogin property to false and token to null in the database
-      const updatedUser = await registerModel.findByIdAndUpdate(
-        hospitalId,
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
           { islogin: false, token: null },
           { new: true }
       );
@@ -501,7 +702,6 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = logout;
 
 
 

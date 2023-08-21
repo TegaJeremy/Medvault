@@ -16,7 +16,7 @@ router.route("/resendverificationemail").post(resendVerificationEmail)
 
 // login and logout route
 router.route("/login").post(login)
-router.route("/logouthospital/:hospitalId").post(logout)
+router.route("/logouthospital/:userId").post(logout)
 
 // password reset and change and forgot
 router.route("/forgotpassword").post(forgotPassword)
