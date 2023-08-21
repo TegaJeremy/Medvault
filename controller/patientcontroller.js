@@ -190,38 +190,69 @@ const createpatient = async (req, res)=>{
       }
   };
   
-  const getonepatient = async (req, res) => {
-    let { patientID } = req.body;
-    if(!patientID || patientID?.trim().length === 0){
-      return res.status(404).json({message:"patientID cannot be empty"})
-    }
+//   const getonepatient = async (req, res) => {
+//     let { patientID } = req.body;
+//     // if(!patientID || patientID?.trim().length === 0){
+//     //   return res.status(404).json({message:"patientID cannot be empty"})
+//     // }
     
-    try {
-        const patient = await patientModel.findOne({ patientID });
+//     try {
+//         const patient = await patientModel.findOne({ patientID });
 
-        if (!patient) {
-            return res.status(404).json({
-                message: "Unable to find patient with ID " + patientID
-            });
-        }
+//         if (!patient) {
+//             return res.status(404).json({
+//                 message: "Unable to find patient with ID " + patientID
+//             });
+//         }
 
-        if (patient.deleted) {
-            return res.status(404).json({
-                message: "Patient with ID " + patientID + " has been deleted and is not available."
-            });
-        }
+//         if (patient.deleted) {
+//             return res.status(404).json({
+//                 message: "Patient with ID " + patientID + " has been deleted and is not available."
+//             });
+//         }
 
-        return res.status(200).json({
-            message: "Patient:",
-            data: patient
-        });
+//         return res.status(200).json({
+//             message: "Patient:",
+//             data: patient
+//         });
 
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// };
+const getonepatient = async (req, res) => {
+  const { patientID } =req.body;
+  console.log(req.body)
+
+  try {
+      const patient = await patientModel.findOne({ patientID });
+
+      if (!patient) {
+          return res.status(404).json({
+              message: "Unable to find patient with ID " + patientID
+          });
+      }
+
+      if (patient.deleted) {
+          return res.status(404).json({
+              message: "Patient with ID " + patientID + " has been deleted and is not available."
+          });
+      }
+
+      return res.status(200).json({
+          message: "Patient:",
+          data: patient
+      });
+
+  } catch (error) {
+      res.status(500).json({
+          message: error.message
+      });
+  }
 };
+
 
 
     

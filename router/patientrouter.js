@@ -9,9 +9,9 @@ router.route("/createpatient/").post(authenticateUser, createpatient)
 router.route("/delete/:patientID").delete( authenticateUser, deletePatient)
 router.route("/recover/:patientID").patch(authenticateUser,recoverpatient)
 router.route("/getallpatient").get(authenticateUser,getallpatient)
-router.route("/getonepatient/:patientID").get(authenticateUser, getonepatient)
-router.route("/updatepatient/:patientID").patchauthenticateUser,(updatePatient)
-router.route("/hospitals/patient/:hospitalcode").getauthenticateUser,(getAllpatientByHospital)
+router.route("/getonepatient").post(authenticateUser, getonepatient)
+router.route("/updatepatient/:patientID").patch(authenticateUser,updatePatient)
+router.route("/hospitals/patient/:hospitalcode").get(authenticateUser,getAllpatientByHospital)
 router.route("/addDiagnosis/").post(authenticateUser,addDiagnosis)
 
 //geting authomatic count
