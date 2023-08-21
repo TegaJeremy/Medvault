@@ -63,9 +63,9 @@ const createpatient = async (req, res)=>{
             }
             
              // Check if the email is already taken
-    const existingPatient = await patientModel.findOne({ email });
-    if (existingPatient) {
-      return res.status(409).json({ message: 'Email already exists' });}
+    // const existingPatient = await patientModel.findOne({ email });
+    // if (existingPatient) {
+    //   return res.status(409).json({ message: 'Email already exists' });}
        // Check if the phoneNumber is provided and not null
     if (!phoneNumber) {
         return res.status(400).json({ message: 'Phone Number is required' });
