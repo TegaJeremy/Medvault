@@ -223,8 +223,8 @@ const createpatient = async (req, res)=>{
 //     }
 // };
 const getonepatient = async (req, res) => {
-  const { patientID } =req.body;
-  console.log(req.body)
+  const { patientID } =req.params;
+  
 
   try {
       const patient = await patientModel.findOne({ patientID });
@@ -245,6 +245,8 @@ const getonepatient = async (req, res) => {
           message: "Patient:",
           data: patient
       });
+      
+
 
   } catch (error) {
       res.status(500).json({
