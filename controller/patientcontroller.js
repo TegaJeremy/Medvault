@@ -245,7 +245,7 @@ const getonepatient = async (req, res) => {
           message: "Patient:",
           data: patient
       });
-      
+        
 
   } catch (error) {
       res.status(500).json({
