@@ -612,9 +612,10 @@ const login = async (req, res) => {
           process.env.secretKey,
           { expiresIn: '1d' }
       );
+
+      
       user.islogin = true
 
-      // Update the user's token (you may want to store this token in the database)
       user.token = token;
       await user.save();
 
@@ -756,15 +757,15 @@ const updatehospitalinfo = async (req, res) => {
       if(facilityaddress?.trim().length === 0){
         return res.status(404).json({message:"facility address cannot be empty"})
       } 
-      if(emailPattern?.test(email)){
-        return res.status(404).json({message:"email pattern not valid"})
-      }
+      // if(emailPattern?.test(email)){
+      //   return res.status(404).json({message:"email pattern not valid"})
+      // }
       if(facilityphone?.trim().length === 0 ||facilityphone?.trim().length >15 ){
         return res.status(404).json({message:" facilityphone phone should not be empty or more than 15 character"})
       }
-      if(!phonePattern?.test(facilityphone) ){
-        return res.status(404).json({message:" facilityphone phone can only contain numbers"})
-      }
+      // if(!phonePattern?.test(facilityphone) ){
+      //   return res.status(404).json({message:" facilityphone phone can only contain numbers"})
+      // }
       if(city?.trim().length === 0){
         return res.status(404).json({message:" city field should not be empty"})
       }

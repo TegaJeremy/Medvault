@@ -276,6 +276,7 @@ const updatePatient = async (req, res) => {
       phoneNumber,
       bloodGroup,
      relationshipStatus,
+     diagnosis,
       spouseName,
       spousePhonenumber,
       otherContacts
@@ -284,45 +285,48 @@ const updatePatient = async (req, res) => {
     let regexPattern = /^[a-zA-Z ]+$/
     let phonePattern = /^[+\d]+$/
     //validate the impute
-    if(!patientName || patientName?.trim().length === 0){
+    if(!patientName?.trim().length === 0){
       return res.status(404).json({message:"patientname imput cannot be epmyt"})
     }  
     if(!regexPattern?.test( patientName)){
       return res.status(404).json({message:"patient name can only contain letters"})
     }  
-    if(!dateOfBirth || dateOfBirth?.trim().length === 0){
+    if(dateOfBirth?.trim().length === 0){
       return res.status(404).json({message:" date of birth cannot be empty"})
     } 
-    if(!gender || gender?.trim().length === 0){
+    if(!gender?.trim().length === 0){
       return res.status(404).json({message:"gender cannot be empty"})
     } 
-    if(!email || !emailPattern?.test(email)){
-      return res.status(404).json({message:"email not valid"})
-    }
-    if(!homeAddress || homeAddress?.trim().length === 0){
+    if(!email?.trim().length === 0){
+      return res.status(404).json({message:"email cannot be epmyt"})
+    } 
+    // if(!emailPattern?.test(email)){
+    //   return res.status(404).json({message:"email not valid"})
+    // }
+    if(!homeAddress?.trim().length === 0){
       return res.status(404).json({message:"home address cannot be empty"})
     } 
-    if(!bloodGroup || bloodGroup?.trim().length === 0){
+    if(! bloodGroup?.trim().length === 0){
       return res.status(404).json({message:"bloodGroup cannot be empty"})
     } 
-     if(!relationshipStatus){
+     if(!relationshipStatus?.trim().length === 0){
       return res.status(404).json({message:"relationshipStatus cannot be empty"})
     } 
-    if(!otherContacts){
+    if(!otherContacts?.trim().length === 0){
       return res.status(404).json({message:"otherContacts cannot be empty"})
     } 
-    if(!diagnosis){
+    if(!diagnosis?.trim().length === 0){
       return res.status(404).json({message:"diagnosis cannot be empty"})
     } 
-    if(!phoneNumber || phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
+    if(!phoneNumber?.trim().length === 0  ){
       return res.status(404).json({message:" phoneNumber pattern not supported"})
     }
-    if(!phonePattern?.test(phoneNumber) ){
-      return res.status(404).json({message:"phoneNumber can only contain numbers"})
-    }
-    if(hospitalcode?.trim().length === 0){
-      return res.status(404).json({message:" hospitalcode should not be empty"})
-    }
+    // if(!phonePattern?.test(phoneNumber) ){
+    //   return res.status(404).json({message:"phoneNumber can only contain numbers"})
+    // }
+    // if(hospitalcode?.trim().length === 0){
+    //   return res.status(404).json({message:" hospitalcode should not be empty"})
+    // }
 
     // const validation = validator(email, phoneNumber, patientName);
     // if (!validation.isValid) {
@@ -341,7 +345,8 @@ const updatePatient = async (req, res) => {
        relationshipStatus: relationshipStatus || patient.relationshipStatus,
       spouseName: spouseName || patient.spouseName,
       spousePhonenumber: spousePhonenumber || patient.spousePhonenumber,
-      otherContacts: otherContacts || patient.otherContacts
+      otherContacts: otherContacts || patient.otherContacts,
+      diagnosis:diagnosis || patient.diagnosis
     };
 
     if (req.files) {
@@ -464,9 +469,12 @@ const addDiagnosis = async (req, res) => {
     }
          
      // Create an object representing the new diagnosis entry
+     
+      // Current date and time
+    
      const newDiagnosisEntry = {
         text: diagnosisText,
-        date: new Date() // Current date and time
+        Added: new Date() // Current date and time
       };
     // Push the new diagnosis text into the diagnosis array
     patient.diagnosis.push(newDiagnosisEntry);

@@ -651,9 +651,9 @@ const updateStaff = async (req, res) => {
       if( age?.trim().length === 0){
         return res.status(404).json({message:"age cannot be empty"})
       } 
-      if(emailPattern?.test(email)){
-        return res.status(404).json({message:"email not valid"})
-      } 
+    //   if(emailPattern?.test(email)){
+    //     return res.status(404).json({message:"email not valid"})
+    //   } 
       // if(phoneNumber?.trim().length === 0 ||facilityphone?.trim().length >15 ){
       //   return res.status(404).json({message:" phoneNumber pattern not supported"})
       // }

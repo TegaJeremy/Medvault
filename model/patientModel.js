@@ -62,8 +62,9 @@ const   patientschema = new mongoose.Schema({
     // deletedAt:{
     //     type:Date, expires:600
     //   },
+}
 
-},{timestamps:true}
+// },{timestamps:true}
 )
 
 const patientModel = mongoose.model("Patient", patientschema)
