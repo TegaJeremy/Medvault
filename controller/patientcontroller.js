@@ -253,6 +253,55 @@ const getonepatient = async (req, res) => {
       });
   }
 };
+// const jwt = require('jsonwebtoken'); // Import the JWT library
+
+// const getonepatient = async (req, res) => {
+//   const { patientID } = req.params;
+//   const token = req.headers.authorization; // Assuming the token is passed in the 'Authorization' header
+
+//   try {
+//     // Verify and decode the token to extract the hospital ID
+//     const decodedToken = jwt.verify(token, process.env.secretKey); // Replace 'yourSecretKey' with your actual secret key
+
+//     // Assuming the token contains a 'hospitalID' field
+//     const requestingHospitalID = decodedToken.hospitalID;
+
+//     const patient = await patientModel.findOne({ patientID });
+
+//     if (!patient) {
+//       return res.status(404).json({
+//         message: "Unable to find patient with ID " + patientID
+//       });
+//     }
+
+//     if (patient.deleted) {
+//       return res.status(404).json({
+//         message: "Patient with ID " + patientID + " has been deleted and is not available."
+//       });
+//     }
+
+//     // Check if the requesting hospital's ID matches the patient's hospitalID
+//     if (patient.hospitalID !== requestingHospitalID) {
+//       return res.status(403).json({
+//         message: "You do not have permission to access this patient's information."
+//       });
+//     }
+
+//     return res.status(200).json({
+//       message: "Patient:",
+//       data: patient
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       message: error.message
+//     });
+//   }
+// };
+
+// module.exports = getonepatient;
+
+
 
 
 
@@ -377,7 +426,6 @@ const updatePatient = async (req, res) => {
 
 
 
-
 //  temporarly deleting a patient from the database
 //incase of mistakes
 const deletePatient = async (req,res)=>{
@@ -410,6 +458,9 @@ const deletePatient = async (req,res)=>{
         const patient = await patientModel.findOne({patientID})
         if(!patient){
             res.status(400).json({message:"patient not found"})
+        }
+        if (!patient.deleted){
+          return res.status(200).json({message:'patient is not deleted and cannot be recovered'})
         }
             // only recover if it was previously deleted
          if(patient.deleted){

@@ -26,11 +26,11 @@ router.route("/resetpassword/:token").post(authenticateUser,resetPassword)
 // admin 
 router.route("/getallhospitals").get(authenticateUser,getallHospital)
 router.route("/getbyid/:hospitalcode").get(authenticateUser,getHospitalByID)
-router.route("/updatehospitalinfo/:hospitalcode").putauthenticateUser,(updatehospitalinfo)
+router.route("/updatehospitalinfo/:hospitalcode").put(authenticateUser, updatehospitalinfo)
 router.route("/deleteaccount/:hospitalcode").post(authenticateUser,deleteAccount)
 
 //creating a staff(sending staff a link)
-router.route('/creatingastaff').post(authenticateUser, createstaff)
+router.route('/creatingastaff').post( createstaff)
 
 //geting hospital
 router.route("/gethospital/:hospitalId").get(authenticateUser, getHospitalWithStaffAndPatients)

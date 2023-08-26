@@ -20,5 +20,4 @@ router.route("/addDiagnosis/").post(authenticateUser,addDiagnosis)
 
 
 
-
 module.exports = router

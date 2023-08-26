@@ -86,7 +86,7 @@ const createStaffprofile = async (req, res) => {
             const salt = bcryptjs.genSaltSync(10)
             const hashPass = bcryptjs.hashSync(password, salt)
             const ID = Math.floor(Math.random() * 10000)
-            const data = {
+            const data = new staffModel( {
                 name,
                 age,
                 email,
@@ -98,40 +98,35 @@ const createStaffprofile = async (req, res) => {
               
                 staffID: ID,                
                photo: { public_id: staffPhoto.public_id, url: staffPhoto.url }
-            }
+            })
             if (password !==confirmPassword ){
               return res.status(404).json({message:"password does not match"})
              }
              // turn the default false in the staff model to true
-                   data.isStaff = true
+                  
                    //push the staff to the hospital model 
 
-                 
-
-            const createStaff = new staffModel(data)
+         const newToken = jwt.sign( { email:data.email,islogin: data.islogin }, process.env.secretKey, { expiresIn: "15m" } );
+           // const createStaff = new staffModel(data)
             // generate token
-            const newToken = jwt.sign({email:data.email , islogin: data.islogin}, process.env.secretKey, { expiresIn: "1d" })
+            // const newToken = jwt.sign({email:data.email , islogin: data.islogin}, process.env.secretKey, { expiresIn: "1d" })
 
-            createStaff.hospitalcode = hospitalcode
+            // createStaff.hospitalcode = hospitalcode
 
-            createStaff.token = newToken
+            // createStaff.token = newToken
 
-            await createStaff.save()
-            gethospital.staff.push(createStaff._id)
-            // save the hospital
-              await gethospital.save()
-            const link = `https://medvault-xixt.onrender.com/#/verification/{newToken}`;
+            // await createStaff.save()
+            // gethospital.staff.push(createStaff._id)
+            // // save the hospital
+            //   await gethospital.save()
+            const link = `https://medvault-xixt.onrender.com/#/verification/${newToken}`;
             // send verification link
             //const baseUrl = process.env.BASE_URL
              const mailOptions = {
                 from: process.env.SENDER_EMAIL,
                  to:email,
-            //     subject: "Verify your account",
-            //     html: `Please click on the link to verify your email: <a href="${link}/">Verify Email</a>`,
-            // };
-            //<!DOCTYPE html>
-           // <img src="cid:unique-image-id" alt="Your Image" style="max-width: 100%; height: auto;">(future local image)
-              html: `
+                 subject: "Verify your account",
+                 html: `
               
               <!DOCTYPE html>
               <html lang="en">
@@ -216,6 +211,13 @@ const createStaffprofile = async (req, res) => {
 
 
             await transporter.sendMail( mailOptions );
+            data.isStaff = true
+           const savedStaff = await data.save()
+            gethospital.staff.push(savedStaff._id)
+            // save the hospital
+              await gethospital.save()
+
+
             //notify the hospitay that a user has use its codes to register
            const notifyhospital = gethospital.email
            const hospitalname = gethospital.facilityname
@@ -305,8 +307,8 @@ const createStaffprofile = async (req, res) => {
           };
           
             await transporter.sendMail( mailOptions2 );
-            res.status(200).json({ message: "Create successful",
-             data: createStaff ,
+            res.status(200).json({ message: `Create successful, please check your email: ${data.email} to veryfy your accoun`,
+             data: savedStaff ,
              newToken})
         }
     } catch (error) {
@@ -493,7 +495,7 @@ const resendVerificationEmail = async (req, res) => {
 
         res.status( 200 ).json( {
             message: `Verification email sent successfully to your email: ${user.email}`,
-            data:token
+            data:newToken
             
         } );
     

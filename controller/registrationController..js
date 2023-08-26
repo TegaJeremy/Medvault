@@ -131,29 +131,11 @@ const register = async (req, res)=>{
      }
     const token = jwt.sign( { email:user.email,islogin: user.islogin }, process.env.secretKey, { expiresIn: "15m" } );
     
-      // return res.status(400).json({message:"erroe trying to validate user",
-      //    error:validate[0].message
-      // })
-      // const baseUrl = process.env.BASE_URL
-      // const link = `http://localhost:5173/verification?token=${token}`
-      // const mailOptions = {
-      //     from: process.env.SENDER_EMAIL,
-      //     to: email,
-      //     subject: "Verify your account",
-          
-      //    // html: `Please click on the link to verify your email: http://localhost:5173/verification/${ token }">Verify Email</a>`,
-      //    // html: `Please click on the link to verify your email: <a href=">Verify Email</a>`,
-      //    text: `plase click on the link to verify your account${link}`
-
-      // };
+     
             const baseUrl = process.env.BASE_URL;
  const link = `https://medvault-xixt.onrender.com/#/verification/${token}`;
  //"/verification/:token" (How frontend should write route)
-//  const scriptDirectory = __dirname;
-//  const relativeImagePath = path.join(scriptDirectory, "WhatsApp_Image_2023-08-18_at_7.10.31_PM-removebg-preview.png");
 
-
- 
 //const link = `http://www.google.com`
 const mailOptions = {
     from: process.env.SENDER_EMAIL,
@@ -416,6 +398,10 @@ const resendVerificationEmail = async (req, res) => {
       const staffUser = await staffModel.findOne({ email });
 
       // Determine if the user exists and is verified in either collection
+      // let user = hospitalUser || staffUser
+      // if(!user){
+      // return   res.status(200).json({message:"user not found"})
+      // }
       let user;
       if (hospitalUser && hospitalUser.isVerified) {
           user = hospitalUser;
@@ -875,64 +861,36 @@ try {
         subject: "Registration",
       //   text:`click on the link to to register, use the code below as your hospital code: ${registrationlink}, hospitalcode:${hospitalcode} `
       //     }
-      html:`
+      html:`     
+            
       <!DOCTYPE html>
-     
-<html>:
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #000000;
-      color: #00FFFF;
-      font-family: Arial, sans-serif;
-      height:100%
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .content {
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.7);
-      border-radius: 10px;
-      color:rgb(253, 250, 250)
-    }
-    .content p {
-      margin-bottom: 10px;
-    }
-    .cta-button {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #00FFFF;
-      color: #000000;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Registration</h1>
-    </div>
-    <div class="content">
-      <p>Click on the link below to register:</p>
-      <p>Use the following code as your hospital code: <strong>${hospitalcode}</strong></p>
-      <p><a href="${registrationlink}" class="cta-button">Register Now</a></p>
-    </div>
-  </div>
-</body>
-</html>`
-  }
+      <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #000000; color: #0c0c0c; font-family: Arial, sans-serif;">
+      
+      <table width="100%" style="max-width: 600px; margin: 0 auto; background-color: rgba(0, 0, 0, 0.7); color: rgb(253, 250, 250);">
+        <tr>
+          <td style="text-align: center;">
+            <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-Vault" style="max-width: 70%; height: auto;">
+            <p style="text-align: center; font-size: 24px; margin-bottom: 20px;">Welcome to Med-Vault</p>
+            <p style="text-align: center; font-size: 18px; margin-bottom: 20px;">Please click on the link below to register:</p>
+            <p style="text-align: center; font-size: 18px; margin-bottom: 20px;">Use the following code as your hospital code: <strong>${hospitalcode}</strong></p>
+            <p style="text-align: center;"><a href="${registrationlink}" style="display: inline-block; padding: 14px 20px; background-color: #00FFFF; color: #000000; text-decoration: none; font-size: 18px; border-radius: 5px;">Register Now</a></p>
+          </td>
+        </tr>
+      </table>
+      
+      </body>
+      </html>
+      
+      
+
+      `
+      
+
+}
 
     await transporter.sendMail( mailOptions2 );
 
