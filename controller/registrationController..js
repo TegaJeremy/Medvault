@@ -141,7 +141,8 @@ const mailOptions = {
     from: process.env.SENDER_EMAIL,
     to: email,
     subject: "Verify your account",
-    html:`<!DOCTYPE html>
+    html:`
+    <!DOCTYPE html>
     <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -164,7 +165,7 @@ const mailOptions = {
             }
     
             .header {
-                background-color: #020202;
+                background-color: rgba(2, 2, 2, 0.561);
                 color: #fff;
                 padding: 10px;
                 text-align: center;
@@ -184,9 +185,9 @@ const mailOptions = {
             }
     
             .button {
-                background-color: red;
+                background-color: 15BFB7;
                 border: none;
-                color: #fff;
+                color: #0a0a0a;
                 padding: 15px 30px; /* Increase button padding for larger size */
                 text-align: center;
                 text-decoration: none;
@@ -198,7 +199,7 @@ const mailOptions = {
             }
     
             .button:hover {
-                background-color: #019599;
+                background-color: #0ab43a;
             }
     
             /* Animation for h1 tags */
@@ -233,10 +234,7 @@ const mailOptions = {
         </div>
     </body>
     </html>
-    
-    
-    
-      `,
+     `,
     //   attachments: [
     //     {
     //         filename: "Medvault.png",
