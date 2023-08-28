@@ -165,16 +165,19 @@ const mailOptions = {
             }
     
             .header {
-                background-color: rgba(2, 2, 2, 0.561);
+                background-color: rgba(2, 2, 2, 0.993);
                 color: #fff;
-                padding: 10px;
+                padding: 4px; /* Reduced padding */
                 text-align: center;
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
+                font-size: 20px; /* Reduced font size */
+                max-width: 60%; /* Reduced width for the header */
+                margin: 0 auto; /* Center the header horizontally */
             }
     
             .header img {
-                max-width: 80%; /* Make sure the image fits within its container */
+                max-width: 50%; /* Reduced image size */
                 display: block; /* Remove any residual space below the image */
                 margin: 0 auto 10px; /* Center the image horizontally and add margin below it */
             }
@@ -185,9 +188,9 @@ const mailOptions = {
             }
     
             .button {
-                background-color: 15BFB7;
+                background-color: #50F2F0;
                 border: none;
-                color: #0a0a0a;
+                color: #000000;
                 padding: 15px 30px; /* Increase button padding for larger size */
                 text-align: center;
                 text-decoration: none;
@@ -222,7 +225,7 @@ const mailOptions = {
     <body>
         <div class="container">
             <div class="header">
-                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT">
+                <img src="cid:unique-image-id" alt="MED-VAULT">
             </div>
             <div class="content">
                 <h1>Hello ${user.facilityname}!</h1>
@@ -234,14 +237,17 @@ const mailOptions = {
         </div>
     </body>
     </html>
+    
+
      `,
-    //   attachments: [
-    //     {
-    //         filename: "Medvault.png",
-    //         path:  "C:\\Users\\OWNER\\Desktop\\Medvault\\Medvault.png", // Path to your image file
-    //         cid: "unique-image-id" // Use a unique CID
-    //     }
-    // ]
+      attachments: [
+        {
+            filename: "Medvault.png",
+            path: "C:\\Users\\OWNER\\Desktop\\Medvault\\curent-medvault image.png"
+, // Path to your image file
+            cid: "unique-image-id" // Use a unique CID
+        }
+    ]
       
 };
 
