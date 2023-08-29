@@ -185,6 +185,7 @@ const mailOptions = {
             .content {
                 padding: 10px;
                 text-align: center; /* Center-align content within the div */
+                color: #000000;
             }
     
             .button {
@@ -225,7 +226,8 @@ const mailOptions = {
     <body>
         <div class="container">
             <div class="header">
-                <img src="cid:unique-image-id" alt="MED-VAULT">
+                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" alt="MED-VAULT">
+                
             </div>
             <div class="content">
                 <h1>Hello ${user.facilityname}!</h1>
@@ -238,16 +240,17 @@ const mailOptions = {
     </body>
     </html>
     
+    
 
      `,
-      attachments: [
-        {
-            filename: "Medvault.png",
-            path: "C:\\Users\\OWNER\\Desktop\\Medvault\\curent-medvault image.png"
-, // Path to your image file
-            cid: "unique-image-id" // Use a unique CID
-        }
-    ]
+//       attachments: [
+//         {
+//             filename: "Medvault.png",
+//             path: "C:\\Users\\OWNER\\Desktop\\Medvault\\curent-medvault image.png"
+// , // Path to your image file
+//             cid: "unique-image-id" // Use a unique CID
+//         }
+//     ]
       
 };
 
@@ -402,22 +405,22 @@ const resendVerificationEmail = async (req, res) => {
       const staffUser = await staffModel.findOne({ email });
 
       // Determine if the user exists and is verified in either collection
-      // let user = hospitalUser || staffUser
-      // if(!user){
-      // return   res.status(200).json({message:"user not found"})
-      // }
-      let user;
-      if (hospitalUser && hospitalUser.isVerified) {
-          user = hospitalUser;
-      } else if (staffUser && staffUser.isVerified) {
-          user = staffUser;
-      } else {
-          return res.status(404).json({
-              error: "User not found or not verified"
-          });
+      let user = hospitalUser || staffUser
+      if(!user){
+      return   res.status(200).json({message:"user not found"})
       }
+      // let user;
+      // if (hospitalUser && hospitalUser.isVerified) {
+      //     user = hospitalUser;
+      // } else if (staffUser && staffUser.isVerified) {
+      //     user = staffUser;
+      // } else {
+      //     return res.status(404).json({
+      //         error: "User not found or not verified"
+      //     });
+      // }
       if (user.isVerified){
-        return res.status(200).json({message:'user already verified'})
+        return res.status(200).json({message:'user email already verified or have been registerd befor'})
       }
 
       // create a token
@@ -440,7 +443,7 @@ const resendVerificationEmail = async (req, res) => {
                     <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e8e8e8;">
                         <div style="background-color: #ffffff; padding: 20px; margin: 10vh auto; max-width: 80%; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); border-radius: 10px;">
                             <div style="background-color: #020202; color: #fff; padding: 10px; text-align: center; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
+                                <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" alt="MED-VAULT" style="max-width: 80%; display: block; margin: 0 auto 10px;">
                             </div>
                             <div style="padding: 20px; text-align: center;">
                                 <h1>Hello ${user.facilityname || user.name}!</h1>
@@ -877,7 +880,7 @@ try {
       <table width="100%" style="max-width: 600px; margin: 0 auto; background-color: rgba(0, 0, 0, 0.7); color: rgb(253, 250, 250);">
         <tr>
           <td style="text-align: center;">
-            <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-Vault" style="max-width: 70%; height: auto;">
+            <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" alt="Med-Vault" style="max-width: 70%; height: auto;">
             <p style="text-align: center; font-size: 24px; margin-bottom: 20px;">Welcome to Med-Vault</p>
             <p style="text-align: center; font-size: 18px; margin-bottom: 20px;">Please click on the link below to register:</p>
             <p style="text-align: center; font-size: 18px; margin-bottom: 20px;">Use the following code as your hospital code: <strong>${hospitalcode}</strong></p>

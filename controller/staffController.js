@@ -187,7 +187,7 @@ const createStaffprofile = async (req, res) => {
                   <div class="container">
                       <div class="header">
                         
-                          <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" style="max-width: 100%; height: auto;">
+                          <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" style="max-width: 100%; height: auto;">
                          
                           <h1 style="color: #ff6600;">Verify Your Account</h1>
                       </div>
@@ -250,7 +250,7 @@ const createStaffprofile = async (req, res) => {
                               max-width: 600px;
                               margin: 0 auto;
                               padding: 20px;
-                              background-color: black;
+                              background-color: white;
                               border-radius: 10px;
                               box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
                           }
@@ -258,12 +258,12 @@ const createStaffprofile = async (req, res) => {
                           .header {
                               text-align: center;
                               margin-bottom: 20px;
-                              color: #333333;
+                              color: black;
                           }
           
                           .content {
                               margin-bottom: 20px;
-                              color: white;
+                              color: black;
                           }
           
                           .button {
@@ -287,7 +287,7 @@ const createStaffprofile = async (req, res) => {
                       <div class="container">
                           <div class="header">
                               <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-vault" style="max-width: 100%; height: auto;">
-                              <h1 style="color: #ff6600;">Staff Registered</h1>
+                              <h1 style="color: black;">Staff Registered</h1>
                           </div>
                           <div class="content">
                               <p>Hello ${hospitalname},</p>
