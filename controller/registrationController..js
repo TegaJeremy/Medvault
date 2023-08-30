@@ -619,6 +619,8 @@ const login = async (req, res) => {
               id: user._id,
               token: user.token,
               LoginRole,
+              hospitalcode: user.hospitalcode,
+              StaffId: user.staffID
           },
       });
   } catch (error) {

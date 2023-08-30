@@ -119,7 +119,7 @@ const createStaffprofile = async (req, res) => {
             // gethospital.staff.push(createStaff._id)
             // // save the hospital
             //   await gethospital.save()
-            const link = `https://medvault-xixt.onrender.com/#/verification/${newToken}`;
+            const link = `https://medvault-xixt.onrender.com/#/verification/`;
             // send verification link
             //const baseUrl = process.env.BASE_URL
              const mailOptions = {
@@ -228,75 +228,80 @@ const createStaffprofile = async (req, res) => {
               to: notifyhospital,
               subject: "STAFF REGISTERED",
               html: `
-                  <!DOCTYPE html>
-                  <html lang="en">
-                  <head>
-                      <meta charset="UTF-8">
-                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                      <style>
-                          /* Reset default styles */
-                          body, p, h1, h2, h3, h4, h5, h6 {
-                              margin: 0;
-                              padding: 0;
-                          }
-          
-                          /* Main styles */
-                          body {
-                              font-family: Arial, sans-serif;
-                              background-color: black;
-                          }
-          
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <style>
+                      /* Reset default styles */
+                      body, p, h1, h2, h3, h4, h5, h6 {
+                          margin: 0;
+                          padding: 0;
+                      }
+              
+                      /* Main styles */
+                      body {
+                          font-family: Arial, sans-serif;
+                          background-color: black;
+                      }
+              
+                      .container {
+                          max-width: 600px;
+                          margin: 0 auto;
+                          padding: 20px;
+                          background-color: white;
+                          border-radius: 10px;
+                          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                      }
+              
+                      .header {
+                          text-align: center;
+                          margin-bottom: 20px;
+                          color: black;
+                      }
+              
+                      .content {
+                          margin-bottom: 20px;
+                          color: black;
+                      }
+              
+                      .button {
+                          display: inline-block;
+                          padding: 10px 20px;
+                          background-color: #007bff;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 5px;
+                      }
+              
+                      /* Responsive adjustments */
+                      @media screen and (max-width: 480px) {
                           .container {
-                              max-width: 600px;
-                              margin: 0 auto;
-                              padding: 20px;
-                              background-color: white;
-                              border-radius: 10px;
-                              box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                              padding: 10px;
                           }
-          
-                          .header {
-                              text-align: center;
-                              margin-bottom: 20px;
-                              color: black;
-                          }
-          
-                          .content {
-                              margin-bottom: 20px;
-                              color: black;
-                          }
-          
-                          .button {
-                              display: inline-block;
-                              padding: 10px 20px;
-                              background-color: #007bff;
-                              color: #ffffff;
-                              text-decoration: none;
-                              border-radius: 5px;
-                          }
-          
-                          /* Responsive adjustments */
-                          @media screen and (max-width: 480px) {
-                              .container {
-                                  padding: 10px;
-                              }
-                          }
-                      </style>
-                  </head>
-                  <body>
-                      <div class="container">
-                          <div class="header">
-                              <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-vault" style="max-width: 100%; height: auto;">
-                              <h1 style="color: black;">Staff Registered</h1>
-                          </div>
-                          <div class="content">
-                              <p>Hello ${hospitalname},</p>
-                              <p>A staff with this email ${email} has just registered on MEDVAULT with your hospital code.</p>
-                          </div>
+                      }
+                  </style>
+              </head>
+              <body>
+                  <div class="container">
+                      <div class="header">
+                          <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="Med-vault" style="max-width: 100%; height: auto;">
+                          <h1 style="color: black;">Staff Registered</h1>
                       </div>
-                  </body>
-                  </html>
-              `,
+                      <div class="content">
+                          <p>Hello ${hospitalname},</p>
+                          <p>A staff with these details:</p>
+                          <p>Name: ${name},</p>
+                          <p>Email: ${email},</p>
+                          <p>Phone Number: ${phoneNumber}</p>
+                          <p>has just registered on MEDVAULT with your hospital code.</p>
+                      </div>
+                  </div>
+              </body>
+              </html>
+
+                            `,
             //   attachments: [
             //     {
             //         filename: "Medvault.png",
@@ -305,7 +310,10 @@ const createStaffprofile = async (req, res) => {
             //     }
             // ]
           };
+
           
+          
+
             await transporter.sendMail( mailOptions2 );
             res.status(200).json({ message: `Create successful, please check your email: ${data.email} to veryfy your accoun`,
              data: savedStaff ,

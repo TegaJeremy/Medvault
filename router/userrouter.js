@@ -19,9 +19,9 @@ router.route("/login").post(login)
 router.route("/logouthospital/:userId").post(logout)
 
 // password reset and change and forgot
-router.route("/forgotpassword").post(authenticateUser,forgotPassword)
-router.route("/changepassword/:token").post(authenticateUser,changePassword)
-router.route("/resetpassword/:token").post(authenticateUser,resetPassword)
+router.route("/forgotpassword").post(forgotPassword)
+router.route("/changepassword/:token").post(changePassword)
+router.route("/resetpassword/:token").post(resetPassword)
 
 // admin 
 router.route("/getallhospitals").get(authenticateUser,getallHospital)
