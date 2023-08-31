@@ -12,14 +12,13 @@ router.route('/staff-resend-verification').post(resendVerificationEmail)
 router.route('/stafflogin').post(logIn)
 router.route('/staffsignout/:staffId').post(signOut)
 router.route('/staffupdate/:staffID').put(authenticateUser,updateStaff)
-router.route('/getonestaff').get(authenticateUser, getOne)
+router.route('/getonestaff/:staffID').get(authenticateUser, getOne)
 router.route('/deletestaff/:hospitalcode/:staffID').delete(authenticateUser, deleteStaff)
 
 // password reset and change and forgot
 router.route("/staff-forgotpassword").post(forgotPassword)
 router.route("/staff-changepassword/:token").post(changePassword)
 router.route("/staff-resetpassword/:token").post(resetPassword)
-
 
 
 

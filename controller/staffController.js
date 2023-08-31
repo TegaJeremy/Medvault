@@ -771,7 +771,7 @@ const deleteStaff = async (req, res) => {
             })
         }else {
             res.status(200).json({
-                message: "all users",
+                message: "staff is:",
                 data: getUser
             })
         }
@@ -783,6 +783,7 @@ const deleteStaff = async (req, res) => {
         })
     }
 }
+
 
 const genToken = async(user)=>{
     const token = await jwt.sign({
