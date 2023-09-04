@@ -102,7 +102,8 @@ const createStaffprofile = async (req, res) => {
             if (password !==confirmPassword ){
               return res.status(404).json({message:"password does not match"})
              }
-             // turn the default false in the staff model to true
+             // turn the default  isVerified false in the staff model to true
+                data.isVerified = true
                   
                    //push the staff to the hospital model 
 
@@ -125,7 +126,7 @@ const createStaffprofile = async (req, res) => {
              const mailOptions = {
                 from: process.env.SENDER_EMAIL,
                  to:email,
-                 subject: "Verify your account",
+                 subject: "WELLCOME TO MEDVAULT",
                  html: `
               
               <!DOCTYPE html>
@@ -192,8 +193,9 @@ const createStaffprofile = async (req, res) => {
                           <h1 style="color: #ff6600;">Verify Your Account</h1>
                       </div>
                       <div class="content">
-                          <p>Thank you for signing up! Please click on the link below to verify your email:</p>
-                          <p><a class="button" href="${link}/">Verify Email</a></p>
+                          <p>Thank you for signing up! we are so happy to have you with us</p>
+                          <p>pleas do enjoy your time on MEDVAULT</p>
+                        
                       </div>
                   </div>
               </body>

@@ -12,7 +12,7 @@ router.route("/getallpatient").get(authenticateUser,getallpatient)
 router.route("/getonepatient/:patientID").get  (authenticateUser, getonepatient)
 router.route("/updatepatient/:patientID").patch(authenticateUser,updatePatient)
 router.route("/hospitals/patient/:hospitalcode").get(authenticateUser,getAllpatientByHospital)
-router.route("/addDiagnosis/").post(authenticateUser,addDiagnosis)
+router.route("/addDiagnosis/").post(addDiagnosis)
 
 //geting authomatic count
 // const { getTotalDataCount }= require("../middleware/middleware")

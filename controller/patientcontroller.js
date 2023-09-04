@@ -523,10 +523,11 @@ const addDiagnosis = async (req, res) => {
      
       // Current date and time
     
-     const newDiagnosisEntry = {
-        text: diagnosisText,
-        Added: new Date() // Current date and time
-      };
+    //  const newDiagnosisEntry = {
+    //     text: diagnosisText,
+    //     Added: new Date() // Current date and time
+    //   };
+    const newDiagnosisEntry = `${diagnosisText} - ${new Date()}`;
     // Push the new diagnosis text into the diagnosis array
     patient.diagnosis.push(newDiagnosisEntry);
 
@@ -534,7 +535,7 @@ const addDiagnosis = async (req, res) => {
     const updatedPatient = await patient.save();
 
     if(updatedPatient){
-         res.status(200).json({messsage:"added to patient successfully"})
+         res.status(200).json({messsage:"added to patient successfully", data:newDiagnosisEntry})
         }else(
         res.status(400).json({message:"error adding text"})
     )
