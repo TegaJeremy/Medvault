@@ -93,7 +93,7 @@ const register = async (req, res)=>{
                 error.message
             }
           })
-
+          
     //salt the password using bcrypt
     const salt = bcrypt.genSaltSync(10)
     //hash the password using bcrypt
@@ -102,21 +102,25 @@ const register = async (req, res)=>{
      
       //creating a function that will generate random id for the hospitals
       
-    //   function generateID(){
-    //     const digits = "123456789";
-    //     let ID = " ";
-    //     for (let i = 0; i < 4; i++ )
-    //     ID += digits[Math.floor(Math.random()* 10)]
-    //     return ID
-    //   }
+      // function generateID(){
+      //   const digits = "123456789";
+      //   let ID = " ";
+      //   for (let i = 0; i < 4; i++ )
+      //   ID += digits[Math.floor(Math.random()* 10)]
+      //   return ID
+      // }
+
+      // let randomId =generateID()
     let ID = Math.floor(Math.random()* 10000)
 
-      
+
+    const emailLowerCase = email.toLowerCase();
+    const name = facilityname.toUpperCase();
       //creating a new data
     const user =  new registerModel( {
-        facilityname, 
+        facilityname:name, 
         facilityaddress,
-        email,
+        email:emailLowerCase,
         password:hashedPassword,
         confirmPassword,
         facilityphone,

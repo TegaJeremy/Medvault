@@ -82,14 +82,16 @@ const createStaffprofile = async (req, res) => {
                 error.message
             }
         })
-            // hash password
+             // hash password
             const salt = bcryptjs.genSaltSync(10)
             const hashPass = bcryptjs.hashSync(password, salt)
             const ID = Math.floor(Math.random() * 10000)
+            const emailLowerCase = email.toLowerCase();
+           const toUppername = name.toUpperCase();
             const data = new staffModel( {
-                name,
+                name:toUppername,
                 age,
-                email,
+                email:emailLowerCase,
                 phoneNumber,
                 password: hashPass,
                 confirmPassword,
