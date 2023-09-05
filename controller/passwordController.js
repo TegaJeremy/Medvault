@@ -57,7 +57,7 @@ const forgotPassword = async (req, res) => {
                     margin: 0;
                     padding: 0;
                     background-color: #000000;
-                    color: #E0F7F6;
+                    color: #ffffff;
                     font-family: Arial, sans-serif;
                 }
                 .container {
@@ -65,7 +65,7 @@ const forgotPassword = async (req, res) => {
                     max-width: 600px;
                     margin: 0 auto;
                     padding: 20px;
-                    background-color: #2aafafaf;
+                    background-color: #070707;
                     border-radius: 10px;
                 }
                 .header {
@@ -73,13 +73,14 @@ const forgotPassword = async (req, res) => {
                     margin-bottom: 20px;
                 }
                 .link {
-                    color: #E0F7F6;
+                    color: #3366cc;
                     text-decoration: none;
-                    border-bottom: 1px solid #fcfcfc;
+                    border-bottom: 1px solid #3366cc;
                     transition: border-bottom 0.3s ease;
                 }
                 .link:hover {
                     border-bottom: 2px solid #e71717;
+                    color:#e71717
                 }
                 .footer {
                     margin-top: 20px;
@@ -111,7 +112,7 @@ const forgotPassword = async (req, res) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/Medvault.png" alt="MED-VAULT" class="image">
+                    <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" alt="MED-VAULT" class="image">
                     <h1>Password Reset</h1>
                 </div>
                 <p>Please click on the link below to reset your password:</p>
