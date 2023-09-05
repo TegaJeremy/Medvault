@@ -190,7 +190,7 @@ const createStaffprofile = async (req, res) => {
                         
                           <img src="https://raw.githubusercontent.com/TegaJeremy/Medvault/main/curent-medvault%20image.png" style="max-width: 100%; height: auto;">
                          
-                          <h1 style="color: #ff6600;">Verify Your Account</h1>
+                          <h1 style="color: #0000;">WELLCOME TO MEDVAULT</h1>
                       </div>
                       <div class="content">
                           <p>Thank you for signing up! we are so happy to have you with us</p>

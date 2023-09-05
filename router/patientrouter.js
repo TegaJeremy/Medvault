@@ -21,3 +21,4 @@ router.route("/addDiagnosis/").post(addDiagnosis)
 
 
 module.exports = router
+
